@@ -9,7 +9,20 @@
 </head>
 <body>
   {% block flash %}{% endblock %}
-  {% block header %}{% endblock %}
+  {% block header %}
+  <header>
+    <nav id="head_nav">
+      <ul class="mhlist">
+        <li><a href="{{ url_for('award') }}">Award</a></li>
+        <li><a href="{{ url_for('name') }}">Name</a></li>
+        <li><a href="{{ url_for('date') }}">Date</a></li>
+        <li><a href="{{ url_for('reign') }}">Reign</a></li>
+        <li><a href="{{ url_for('op') }}">OP</a></li>
+        <li><a href="{{ url_for('logout') }}">Logout</a></li>
+      </ul>
+    </nav>
+  </header>
+  {% endblock %}
   {% block content %}{% endblock %}
   {% block footer %}
   <footer>

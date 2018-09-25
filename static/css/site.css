@@ -3,15 +3,15 @@ th {
   text-align: left;
 }
 
-#foot_nav {
+#foot_nav, #head_nav {
   text-align: center;
 }
 
-#foot_nav ul.mhlist {
+#foot_nav ul.mhlist, #head_nav ul.mhlist {
   display: inline;
 }
 
-#foot_nav ul.mhlist li:before {
+#foot_nav ul.mhlist li:before, #head_nav ul.mhlist li:before {
   margin: 0 0.5em;
 }
 
