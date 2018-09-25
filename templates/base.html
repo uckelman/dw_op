@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+{% block head %}
+  <meta charset="utf-8">
+  <title>{% block title %}{% endblock %}</title>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/site.css') }}"/>
+{% endblock %}
+</head>
+<body>
+  {% block flash %}{% endblock %}
+  {% block header %}{% endblock %}
+  {% block content %}{% endblock %}
+  {% block footer %}
+  <footer>
+    <nav id="foot_nav">
+      <ul class="mhlist">
+        <li><a href="{{ url_for('award') }}">Award</a></li>
+        <li><a href="{{ url_for('name') }}">Name</a></li>
+        <li><a href="{{ url_for('date') }}">Date</a></li>
+        <li><a href="{{ url_for('reign') }}">Reign</a></li>
+        <li><a href="{{ url_for('op') }}">OP</a></li>
+      </ul>
+    </nav>
+  </footer>
+  {% endblock %}
+</body>
+</html>

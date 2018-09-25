@@ -1,0 +1,32 @@
+th {
+  font-weight: normal;
+  text-align: left;
+}
+
+#foot_nav {
+  text-align: center;
+}
+
+#foot_nav ul.mhlist {
+  display: inline;
+}
+
+#foot_nav ul.mhlist li:before {
+  margin: 0 0.5em;
+}
+
+ul.mhlist {
+  padding: 0;
+}
+
+ul.mhlist li {
+  display: inline;
+}
+
+ul.mhlist li::before {
+  content: ' · ';
+}
+
+ul.mhlist li:first-child::before {
+  content: '';
+}

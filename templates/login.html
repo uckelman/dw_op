@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+{% block header %}{% endblock %}
+{% block content %}
+  <form method="post">
+    <dl>
+      <dt>Username:</dt>
+      <dd><input type="text" name="username" required autofocus></dd>
+      <dt>Password:</dt>
+      <dd><input type="password" name="password" required></dd>
+      <dd><input type="submit" value="Login"></dd>
+    </dl>
+  </form>
+{% endblock %}
+{% block footer %}{% endblock %}

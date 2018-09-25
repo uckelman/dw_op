@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Order of Precedence{% endblock %}
+{% block content %}
+  <form method="post">
+    <table>
+      <tr>
+        <select name="precedence">
+          <option value="1000">Duchy</option> 
+          <option value="900">County</option>
+          <option value="800">Viscounty</option>
+          <option value="700">Bestowed peerages</option>
+          <option value="600">Court Barony</option>
+          <option value="500">Grant of Arms awards</option>
+          <option value="400">Grant of Arms</option>
+          <option value="300">Award of Arms awards</option>
+          <option value="200">Award of Arms</option>
+        </select> and above
+      </tr>
+      <tr>
+        <td/>
+        <td>
+          <button type="submit" value="Search">Search</button>
+        </td>
+      </tr>
+    </table>
+  </form>
+
+  {% if results %}
+  <table>
+    {% for i in results -%}
+    <tr>
+      <td><a href="{{ url_for('persona', name=i[0]) }}">{{i[0]}}</a></td>
+      <td>{{i[1]}}</td>
+      <td>{{i[2]}}</td>
+    </tr>
+    {% endfor -%}
+  </table>
+  {% endif %}
+{% endblock %}
