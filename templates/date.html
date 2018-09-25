@@ -5,7 +5,7 @@
   <table>
     {% for i in results -%}
     <tr>
-      <td>{{i[0]}}</td>
+      <td><a href="{{ url_for('persona', name=i[0]) }}">{{i[0]}}</a></td>
       <td>{{i[1]}}</td>
       <td>{{i[2]}}</td>
     </tr>

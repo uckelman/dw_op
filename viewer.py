@@ -137,20 +137,54 @@ def award():
     )
 
 
-@app.route('/name', methods=['GET', 'POST'])
+@app.route('/modern', methods=['GET', 'POST'])
 @login_required
-def name():
+def modern_search():
+    matches = []
+
     if request.method == 'POST':
-        persona = request.form['persona']
-        if persona:
-            return redirect(url_for('persona', name=persona))
-        else:
-            prename = request.form['prename']
-            surname = request.form['surname']
-            return redirect(url_for('person', surname=surname, prename=prename))
+        prename = request.form['prename'].strip()
+        surname = request.form['surname'].strip()
+
+        if prename or surname:
+            c = get_db().cursor()
+
+            qhead = 'SELECT id, surname, prename FROM people WHERE '
+
+            if surname:
+                if prename:
+                    matches = do_query(c, qhead + 'surname LIKE ? AND prename LIKE ?', '%{}%'.format(surname), '%{}%'.format(prename))
+                else:
+                    matches = do_query(c, qhead + 'surname LIKE ?', '%{}%'.format(surname))
+            elif prename:
+                matches = do_query(c, qhead + 'prename LIKE ?', '%{}%'.format(prename))
+
+            if len(matches) == 1:
+                return redirect(url_for('person', surname=matches[0][1], prename=matches[0][2]))
 
     return render_template(
-        'name.html'
+        'modern.html',
+        matches=matches
+    )
+
+
+@app.route('/sca', methods=['GET', 'POST'])
+@login_required
+def sca_search():
+    matches = []
+
+    if request.method == 'POST':
+        persona = request.form['persona'].strip()
+        if persona:
+            c = get_db().cursor()
+            matches = do_query(c, 'SELECT id, name FROM personae WHERE name LIKE ?', '%{}%'.format(persona))
+
+            if len(matches) == 1:
+                return redirect(url_for('persona', name=matches[0][1]))
+
+    return render_template(
+        'sca.html',
+        matches=matches
     )
 
 
@@ -160,8 +194,8 @@ def date():
     results = None
 
     if request.method == 'POST':
-        begin = request.form['begin']
-        end = request.form['end']
+        begin = request.form['begin'].strip()
+        end = request.form['end'].strip()
         c = get_db().cursor()
         results = do_query(c, 'SELECT personae.name, award_types.name, awards.date FROM personae JOIN awards ON personae.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id WHERE datetime(?) <= datetime(awards.date) AND datetime(awards.date) <= datetime(?) ORDER BY awards.date', begin, end)
 
