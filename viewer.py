@@ -197,7 +197,7 @@ def date():
         begin = request.form['begin'].strip()
         end = request.form['end'].strip()
         c = get_db().cursor()
-        results = do_query(c, 'SELECT personae.name, award_types.name, awards.date FROM personae JOIN awards ON personae.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id WHERE datetime(?) <= datetime(awards.date) AND datetime(awards.date) <= datetime(?) ORDER BY awards.date', begin, end)
+        results = do_query(c, 'SELECT personae.name, award_types.name, awards.date FROM personae JOIN awards ON personae.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id WHERE date(?) <= date(awards.date) AND date(awards.date) <= date(?) ORDER BY awards.date', begin, end)
 
     return render_template(
         'date.html',
