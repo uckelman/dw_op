@@ -205,8 +205,6 @@ def date():
     )
 
 
-
-
 @app.route('/reign', methods=['GET', 'POST'])
 @login_required
 def reign():
