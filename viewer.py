@@ -79,11 +79,28 @@ def front():
 @login_required
 def persona(name):
     c = get_db().cursor()
+
+    person_id, has_modname, region, blazon, emblazon = do_query(c, 'SELECT people.id, people.surname IS NOT NULL OR people.prename IS NOT NULL, regions.name, people.blazon, people.emblazon FROM personae JOIN people ON personae.person_id = people.id JOIN regions ON people.region_id = regions.id WHERE personae.name = ?', name)[0]
+
+    former = do_query(c, 'SELECT name FROM personae WHERE person_id = ? AND name != ? ORDER BY name', person_id, name);
+    if former:
+        former = [f[0] for f in former]
+
+    if emblazon:
+        emblazon = '<img class="emblazon" src="{}"/>'.format(url_for('static', filename='images/arms/' + emblazon))
+    else:
+        emblazon = '<div class="emblazon noarms"><div>I have not given<br/>Post Horn my<br/> arms. I am a<br/> bad person.</div></div>'
+
     awards = do_query(c, 'SELECT p2.name, award_types.name, awards.date, crowns.name, events.name FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id JOIN groups ON award_types.group_id = groups.id JOIN events ON awards.event_id = events.id LEFT OUTER JOIN crowns ON awards.crown_id = crowns.id WHERE p1.name = ? ORDER BY awards.date', name)
 
     return render_template(
         'persona.html',
         name=name,
+        former=former,
+        region=region,
+        has_modname=has_modname,
+        blazon=blazon,
+        emblazon=emblazon,
         awards=awards
     )
 
