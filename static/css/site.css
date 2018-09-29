@@ -1,10 +1,30 @@
 @import url('https://fonts.googleapis.com/css?family=IM+Fell+English');
 @import url('https://fonts.googleapis.com/css?family=IM+Fell+English+SC');
+@import url('https://fonts.googleapis.com/css?family=Goudy+Bookletter+1911');
+
+* {
+  margin: 0;
+  padding: 0;
+}
 
 body {
-  font-family: 'IM Fell English', serif;
-  font-size: 1.3em;
+/*  font-family: 'IM Fell English', serif; */
+  font-family: 'Goudy Bookletter 1911', serif; */
+  font-size: 1.4em;
   line-height: 1.4;
+}
+
+#content {
+  margin: 1em 1em 1em 2em;
+}
+
+#details {
+  margin: 1em 0;
+}
+
+#awards {
+  margin: 1em 0;
+  clear: both;
 }
 
 a {
@@ -23,12 +43,30 @@ th {
   text-align: left;
 }
 
+.emblazon {
+  float: left;
+  margin: 0 2em 1em 0;
+}
+
+.noarms {
+  height: 159px;
+  width: 133px;
+  background-image: url("../images/arms/noarms.png");
+  background-repeat: no-repeat;
+  background-position: center;
+/*  display: inline-block; */
+}
+
+.noarms div {
+  padding-top: 1em;
+  text-align: center;
+}
+
 table.results {
   border-collapse: collapse;
   border-spacing: 0;
   font-variant-numeric: lining-nums tabular-nums;
-  margin-left: auto;
-  margin-right: auto;
+  width: 100%;
 }
 
 table.results thead, table.results tbody {
@@ -42,8 +80,8 @@ table.results tbody tr {
 */
 
 table.results th {
-  font-family: 'IM Fell English SC', serif;
-/*  font-variant: small-caps; */
+/*  font-family: 'IM Fell English SC', serif; */
+  font-variant: small-caps;
 }
 
 table.results th, table.results td {
