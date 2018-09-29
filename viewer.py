@@ -79,7 +79,7 @@ def front():
 @login_required
 def persona(name):
     c = get_db().cursor()
-    awards = do_query(c, 'SELECT p2.name, award_types.name, awards.date FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id WHERE p1.name = ? ORDER BY awards.date', name)
+    awards = do_query(c, 'SELECT p2.name, award_types.name, awards.date, crowns.name, events.name FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id JOIN groups ON award_types.group_id = groups.id JOIN events ON awards.event_id = events.id LEFT OUTER JOIN crowns ON awards.crown_id = crowns.id WHERE p1.name = ? ORDER BY awards.date', name)
 
     return render_template(
         'persona.html',
@@ -92,7 +92,7 @@ def persona(name):
 @login_required
 def person(surname, prename):
     c = get_db().cursor()
-    awards = do_query(c, 'SELECT personae.name, award_types.name, awards.date FROM people JOIN personae ON people.id = personae.person_id JOIN awards ON personae.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id WHERE people.surname = ? AND people.prename = ? ORDER BY awards.date', surname, prename)
+    awards = do_query(c, 'SELECT personae.name, award_types.name, groups.name, awards.date FROM people JOIN personae ON people.id = personae.person_id JOIN awards ON personae.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id JOIN groups ON award_types.group_id = groups.id WHERE people.surname = ? AND people.prename = ? ORDER BY awards.date', surname, prename)
 
     return render_template(
         'person.html',
