@@ -2,14 +2,26 @@
 {% block title %}Drachenwald OP - {{name}}{% endblock %}
 {% block content %}
   {% if awards %}
-  <table>
-    {% for i in awards -%}
-    <tr>
-      <td>{{i[0]}}</td>
-      <td>{{i[1]}}</td>
-      <td>{{i[2]}}</td>
-    </tr>
-    {% endfor -%}
+  <table class="results">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Award</th>
+        <th>Date</th>
+        <th>Crown</th>
+        <th>Event</th>
+      </tr>
+    </thead>
+    <tbody>
+      </tr>
+      {% for i in awards -%}
+      <tr>
+        {% for j in i %}
+        <td>{{j}}</td>
+        {% endfor -%}
+      </tr>
+      {% endfor -%}
+    </tbody>
   </table>
   {% endif %}
 {% endblock %}
