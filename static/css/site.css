@@ -1,5 +1,7 @@
+/*
 @import url('https://fonts.googleapis.com/css?family=IM+Fell+English');
 @import url('https://fonts.googleapis.com/css?family=IM+Fell+English+SC');
+*/
 @import url('https://fonts.googleapis.com/css?family=Goudy+Bookletter+1911');
 
 * {
@@ -9,13 +11,17 @@
 
 body {
 /*  font-family: 'IM Fell English', serif; */
-  font-family: 'Goudy Bookletter 1911', serif; */
-  font-size: 1.4em;
+  font-family: 'Goudy Bookletter 1911', serif;
+  font-variant: oldstyle-nums common-ligatures discretionary-ligatures contextual;
+/*  font-size: 1.4em; */
   line-height: 1.4;
+  color: black;
+  max-width: 65em;
+  margin: 0 auto;
 }
 
 #content {
-  margin: 1em 1em 1em 2em;
+  margin: 2em 1em 2em 2em;
 }
 
 #details {
@@ -86,6 +92,7 @@ table.results th {
 
 table.results th, table.results td {
   padding: 0.25em 0.5em 0.125em 0.5em;
+  vertical-align: top;
 }
 
 table.results thead th {
@@ -98,7 +105,7 @@ table.results thead th {
   margin-bottom: 1em;
   font-variant: small-caps;
   text-align: center;
-  font-family: 'IM Fell English SC', serif;
+/* font-family: 'IM Fell English SC', serif; */
 }
 
 #foot_nav ul.mhlist, #head_nav ul.mhlist {
