@@ -1,10 +1,66 @@
+@import url('https://fonts.googleapis.com/css?family=IM+Fell+English');
+@import url('https://fonts.googleapis.com/css?family=IM+Fell+English+SC');
+
+body {
+  font-family: 'IM Fell English', serif;
+  font-size: 1.3em;
+  line-height: 1.4;
+}
+
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  background: #fbf3f3;
+  transition-property: background;
+  transition-duration: 0.2s;
+  border-radius: 8px;
+}
+
 th {
   font-weight: normal;
   text-align: left;
 }
 
+table.results {
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-variant-numeric: lining-nums tabular-nums;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+table.results thead, table.results tbody {
+  border-bottom: 1px solid #dddddd;
+}
+
+/*
+table.results tbody tr {
+  border-top: 1px solid #dddddd;
+}
+*/
+
+table.results th {
+  font-family: 'IM Fell English SC', serif;
+/*  font-variant: small-caps; */
+}
+
+table.results th, table.results td {
+  padding: 0.25em 0.5em 0.125em 0.5em;
+}
+
+table.results thead th {
+  font-weight: bold;
+  text-align: left;
+}
+
 #foot_nav, #head_nav {
+  margin-top: 1em;
+  margin-bottom: 1em;
+  font-variant: small-caps;
   text-align: center;
+  font-family: 'IM Fell English SC', serif;
 }
 
 #foot_nav ul.mhlist, #head_nav ul.mhlist {
