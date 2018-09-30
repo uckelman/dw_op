@@ -1,15 +1,33 @@
 {% extends "base.html" %}
 {% block title %}Drachenwald OP - {{prename}} {{surname}}{% endblock %}
 {% block content %}
-  {% if awards %}
-  <table>
-    {% for i in awards -%}
-    <tr>
-      {% for j in i %}
-      <td>{{j}}</td>
-      {% endfor -%}
-    </tr>
-    {% endfor -%}
-  </table>
-  {% endif %}
+<div id="content">
+  <div id="details">
+    <h1>{{prename}}{{ ' ' if prename and surname}}{{surname}}</h1>
+  </div>
+  <div id="awards">
+    {% if awards %}
+    <table class="results">
+      <thead>
+        <tr>
+          <th>Award</th>
+          <th>Date</th>
+          <th>Crown</th>
+          <th>Event</th>
+        </tr>
+      </thead>
+      <tbody>
+        </tr>
+        {% for i in awards -%}
+        <tr>
+          {% for j in i %}
+          <td>{{j}}</td>
+          {% endfor -%}
+        </tr>
+        {% endfor -%}
+      </tbody>
+    </table>
+    {% endif %}
+  </div>
+</div>
 {% endblock %}
