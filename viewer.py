@@ -238,7 +238,24 @@ def op():
     if request.method == 'POST':
         min_precedence = request.form['precedence']
         c = get_db().cursor()
-        results = do_query(c, 'SELECT mrp.name, award_types.name, awards.date, MAX(award_types.precedence) FROM awards JOIN personae ON awards.persona_id = personae.id JOIN award_types ON awards.type_id = award_types.id JOIN (SELECT personae.person_id, personae.name, MAX(awards.date) FROM personae JOIN awards ON personae.id = awards.persona_id GROUP BY personae.person_id ORDER BY personae.name) AS mrp ON mrp.person_id = personae.person_id WHERE award_types.precedence >= ? GROUP BY mrp.person_id ORDER BY award_types.precedence DESC, awards.date, mrp.name', min_precedence)
+        results = do_query(c, 'SELECT mrp.name, awards.date, MAX(award_types.precedence) FROM awards JOIN personae ON awards.persona_id = personae.id JOIN award_types ON awards.type_id = award_types.id JOIN (SELECT personae.person_id, personae.name, MAX(awards.date) FROM personae JOIN awards ON personae.id = awards.persona_id GROUP BY personae.person_id ORDER BY personae.name) AS mrp ON mrp.person_id = personae.person_id WHERE award_types.precedence >= ? GROUP BY mrp.person_id ORDER BY award_types.precedence DESC, awards.date, mrp.name', min_precedence)
+
+        headers = {
+            1000: 'Duchy',
+             900: 'County',
+             800: 'Vicounty',
+             700: 'Bestowed peerages',
+             600: 'Court Barony',
+             500: 'Grant of Arms awards',
+             400: 'Grant of Arms',
+             300: 'Award of Arms awards',
+             200: 'Award of Arms'
+        }
+
+        x = collections.defaultdict(list)
+        for r in results:
+            x[headers[r[2]]].append((r[0], r[1]))
+        results = x
 
     return render_template(
         'op.html',

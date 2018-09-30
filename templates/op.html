@@ -1,6 +1,27 @@
 {% extends "base.html" %}
 {% block title %}Order of Precedence{% endblock %}
 {% block content %}
+<div id="content">
+  {% if results %}
+  <div id="awards">
+    <table class="op">
+      {% for k, v in results.items() -%}
+      <tbody>
+        <tr>
+          <th colspan="2">{{k}}</th>
+        </tr>
+        {% for r in v %}
+        <tr>
+          <td><a href="{{ url_for('persona', name=r[0]) }}">{{r[0]}}</a></td>
+          <td>{{r[1]}}</td>
+        </tr>
+        {% endfor -%}
+      </tbody>
+      {% endfor -%}
+    </table>
+  </div>
+  {% endif %}
+
   <form method="post">
     <table>
       <tr>
@@ -24,16 +45,5 @@
       </tr>
     </table>
   </form>
-
-  {% if results %}
-  <table>
-    {% for i in results -%}
-    <tr>
-      <td><a href="{{ url_for('persona', name=i[0]) }}">{{i[0]}}</a></td>
-      <td>{{i[1]}}</td>
-      <td>{{i[2]}}</td>
-    </tr>
-    {% endfor -%}
-  </table>
-  {% endif %}
+</div>
 {% endblock %}
