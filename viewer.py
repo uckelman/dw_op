@@ -209,15 +209,19 @@ def sca_search():
 @login_required
 def date():
     results = None
+    begin = None
+    end = None
 
     if request.method == 'POST':
         begin = request.form['begin'].strip()
         end = request.form['end'].strip()
         c = get_db().cursor()
-        results = do_query(c, 'SELECT personae.name, award_types.name, awards.date FROM personae JOIN awards ON personae.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id WHERE date(?) <= date(awards.date) AND date(awards.date) <= date(?) ORDER BY awards.date', begin, end)
+        results = do_query(c, 'SELECT personae.name, award_types.name, awards.date, crowns.name, events.name FROM personae JOIN awards ON personae.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id JOIN events ON awards.event_id = events.id LEFT OUTER JOIN crowns ON awards.crown_id = crowns.id WHERE date(?) <= date(awards.date) AND date(awards.date) <= date(?) ORDER BY awards.date, personae.name, award_types.name', begin, end)
 
     return render_template(
         'date.html',
+        begin=begin,
+        end=end,
         results=results
     )
 
