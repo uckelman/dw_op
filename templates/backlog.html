@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Scroll Backlog{% endblock %}
+{% block content %}
+<div id="content">
+  <h1>Scroll Backlog</h1>
+  
+  <div id="awards">
+    <table class="results">
+      <thead>
+        <tr>
+          <th>Recipient</th>
+          <th>Award</th>
+          <th>Crown</th>
+          <th>Date</th>
+          <th>Event</th>
+          <th>Status</th>
+          <th>Scribe</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for i in results -%}
+        <tr>
+          {% for j in i -%}
+          <td>{{j}}</td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

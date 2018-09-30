@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Reigns{% endblock %}
+{% block content %}
+<div id="content">
+  <h1>Reigns</h1>
+  
+  <div id="awards">
+    <table class="results">
+      <thead>
+        <tr>
+          <th>Crowns</th>
+          <th>Start</th>
+          <th>End</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for i in results -%}
+        <tr>
+          {% for j in i -%}
+          <td>{{j}}</td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

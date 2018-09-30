@@ -267,5 +267,29 @@ def op():
     )
 
 
+@app.route('/reigns', methods=['GET'])
+@login_required
+def reigns():
+    c = get_db().cursor()
+    results = do_query(c, 'SELECT sov1 || " and " || sov2, begin, end FROM reigns ORDER BY begin')
+
+    return render_template(
+        'reigns.html',
+        results=results
+    )
+
+
+@app.route('/backlog', methods=['GET', 'POST'])
+@login_required
+def backlog():
+    c = get_db().cursor()
+    results = do_query(c, 'SELECT personae.name, award_types.name, crowns.name, awards.date, events.name, scroll_status.name, scribes.name FROM awards JOIN personae ON awards.persona_id = personae.id JOIN award_types ON awards.type_id = award_types.id JOIN events ON awards.event_id = events.id LEFT OUTER JOIN crowns ON awards.crown_id = crowns.id JOIN scroll_status ON awards.scroll_status_id = scroll_status.id JOIN scribes ON awards.scribe_id = scribes.id WHERE awards.scroll_status_id != 4 ORDER BY awards.date, personae.name')
+
+    return render_template(
+        'backlog.html',
+        results=results
+    )
+    
+
 if __name__ == '__main__':
     app.run()
