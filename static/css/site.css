@@ -68,11 +68,41 @@ th {
   text-align: center;
 }
 
+table.op {
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+table.op th {
+  font-variant: small-caps;
+  font-weight: bold;
+}
+
+table.op th, table.op td {
+  padding: 0.25em 0.5em 0.125em 0.5em;
+  vertical-align: top;
+}
+
+table.op td:first-child {
+  padding-left: 5em;
+}
+
+table.op tbody + tbody th:first-child {
+  padding-top: 1em;
+}
+
+/*
+table.op tbody + tbody th:first-child {
+  padding-top: 5em;
+}
+*/
+
 table.results {
   border-collapse: collapse;
   border-spacing: 0;
   font-variant-numeric: lining-nums tabular-nums;
-  width: 100%;
+/*  width: 100%; */
 }
 
 table.results thead, table.results tbody {
