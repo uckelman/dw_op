@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import itertools
 import os
 import sqlite3
 import traceback
@@ -237,6 +238,7 @@ def reign():
 @app.route('/op', methods=['GET', 'POST'])
 @login_required
 def op():
+    headers = None
     results = None
 
     if request.method == 'POST':
@@ -256,13 +258,11 @@ def op():
              200: 'Award of Arms'
         }
 
-        x = collections.defaultdict(list)
-        for r in results:
-            x[headers[r[2]]].append((r[0], r[1]))
-        results = x
+        results = itertools.groupby(results, key=lambda r: r[2])
 
     return render_template(
         'op.html',
+        headers=headers,
         results=results
     )
 

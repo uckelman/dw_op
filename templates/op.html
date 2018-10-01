@@ -5,12 +5,12 @@
   {% if results %}
   <div id="awards">
     <table class="op">
-      {% for k, v in results.items() -%}
+      {% for prec, group in results -%}
       <tbody>
         <tr>
-          <th colspan="2">{{k}}</th>
+          <th colspan="2">{{headers[prec]}}</th>
         </tr>
-        {% for r in v %}
+        {% for r in group %}
         <tr>
           <td><a href="{{ url_for('persona', name=r[0]) }}">{{r[0]}}</a></td>
           <td>{{r[1]}}</td>
