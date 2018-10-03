@@ -14,7 +14,20 @@
         </tr>
       </thead>
       <tbody>
-        {% for i in results -%}
+        <tr>
+          <th>Princes and Princesses of Drachenwald</th>
+        </tr>
+        {% for i in principality -%}
+        <tr>
+          {% for j in i -%}
+          <td>{{j}}</td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+        <tr>
+          <th>Kings and Queens of Drachenwald</th>
+        </tr>
+        {% for i in kingdom -%}
         <tr>
           {% for j in i -%}
           <td>{{j}}</td>

@@ -76,6 +76,9 @@ def front():
     )
 
 
+# FIXME: always display with most recent name
+# FIXME: clean up queries
+
 @app.route('/persona/<name>', methods=['GET'])
 @login_required
 def persona(name):
@@ -83,7 +86,9 @@ def persona(name):
 
     person_id, has_modname, region, blazon, emblazon = do_query(c, 'SELECT people.id, people.surname IS NOT NULL OR people.prename IS NOT NULL, regions.name, people.blazon, people.emblazon FROM personae JOIN people ON personae.person_id = people.id JOIN regions ON people.region_id = regions.id WHERE personae.name = ?', name)[0]
 
-    former = do_query(c, 'SELECT name FROM personae WHERE person_id = ? AND name != ? ORDER BY name', person_id, name);
+    cur_id, curname, _ = do_query(c, 'SELECT personae.id, personae.name, MAX(awards.date) FROM awards JOIN personae ON awards.persona_id = personae.id JOIN people ON people.id = personae.person_id WHERE people.id = ?', person_id)[0];
+
+    former = do_query(c, 'SELECT name FROM personae WHERE person_id = ? AND id != ? ORDER BY name', person_id, cur_id);
     if former:
         former = [f[0] for f in former]
 
@@ -92,11 +97,11 @@ def persona(name):
     else:
         emblazon = '<div class="emblazon noarms"><div>I have not given<br/>Post Horn my<br/> arms. I am a<br/> bad person.</div></div>'
 
-    awards = do_query(c, 'SELECT p2.name, award_types.name, awards.date, crowns.name, events.name FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id JOIN groups ON award_types.group_id = groups.id JOIN events ON awards.event_id = events.id LEFT OUTER JOIN crowns ON awards.crown_id = crowns.id WHERE p1.name = ? ORDER BY awards.date', name)
+    awards = do_query(c, 'SELECT p2.name, award_types.name, awards.date, crowns.name, events.name FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id JOIN events ON awards.event_id = events.id LEFT OUTER JOIN crowns ON awards.crown_id = crowns.id WHERE p1.name = ? ORDER BY awards.date, award_types.name', name)
 
     return render_template(
         'persona.html',
-        name=name,
+        name=curname,
         former=former,
         region=region,
         has_modname=has_modname,
@@ -106,11 +111,14 @@ def persona(name):
     )
 
 
+# FIXME: fails with just one name component
+
 @app.route('/person/<surname>/<prename>', methods=['GET'])
 @login_required
 def person(surname, prename):
     c = get_db().cursor()
-    awards = do_query(c, 'SELECT personae.name, award_types.name, groups.name, awards.date FROM people JOIN personae ON people.id = personae.person_id JOIN awards ON personae.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id JOIN groups ON award_types.group_id = groups.id WHERE people.surname = ? AND people.prename = ? ORDER BY awards.date', surname, prename)
+
+    awards = do_query(c, 'SELECT award_types.name, awards.date, crowns.name, events.name FROM awards JOIN personae ON awards.persona_id = personae.id JOIN people ON personae.person_id = people.id JOIN award_types ON awards.type_id = award_types.id JOIN events ON awards.event_id = events.id LEFT OUTER JOIN crowns ON awards.crown_id = crowns.id WHERE people.surname = ? AND people.prename = ? ORDER BY awards.date, award_types.name', surname, prename)
 
     return render_template(
         'person.html',
@@ -122,9 +130,9 @@ def person(surname, prename):
 
 # TODO: add checkbox for name when given vs name last used?
 
-@app.route('/award', methods=['GET', 'POST'])
+@app.route('/awards', methods=['GET', 'POST'])
 @login_required
-def award():
+def awards():
     results = None
 
     c = get_db().cursor()
@@ -142,7 +150,7 @@ def award():
         results = do_query(c, 'SELECT personae.name, award_types.name, awards.date FROM awards JOIN personae ON awards.persona_id = personae.id JOIN award_types ON awards.type_id = award_types.id WHERE award_types.id IN ({}) ORDER BY awards.date, personae.name'.format(','.join(['?'] * len(a_ids))), *a_ids)
 
     return render_template(
-        'award.html',
+        'awards.html',
         awards_sca=awards_sca,
         awards_dw=awards_dw,
         awards_id=awards_id,
@@ -155,69 +163,15 @@ def award():
     )
 
 
-@app.route('/modern', methods=['GET', 'POST'])
-@login_required
-def modern_search():
-    matches = []
-
-    if request.method == 'POST':
-        prename = request.form['prename'].strip()
-        surname = request.form['surname'].strip()
-
-        if prename or surname:
-            c = get_db().cursor()
-
-            qhead = 'SELECT id, surname, prename FROM people WHERE '
-
-            if surname:
-                if prename:
-                    matches = do_query(c, qhead + 'surname LIKE ? AND prename LIKE ?', '%{}%'.format(surname), '%{}%'.format(prename))
-                else:
-                    matches = do_query(c, qhead + 'surname LIKE ?', '%{}%'.format(surname))
-            elif prename:
-                matches = do_query(c, qhead + 'prename LIKE ?', '%{}%'.format(prename))
-
-            if len(matches) == 1:
-                return redirect(url_for('person', surname=matches[0][1], prename=matches[0][2]))
-
-    return render_template(
-        'modern.html',
-        matches=matches
-    )
-
-
-@app.route('/sca', methods=['GET', 'POST'])
-@login_required
-def sca_search():
-    matches = []
-
-    if request.method == 'POST':
-        persona = request.form['persona'].strip()
-        if persona:
-            c = get_db().cursor()
-            matches = do_query(c, 'SELECT id, name FROM personae WHERE name LIKE ?', '%{}%'.format(persona))
-
-            if len(matches) == 1:
-                return redirect(url_for('persona', name=matches[0][1]))
-
-    return render_template(
-        'sca.html',
-        matches=matches
-    )
-
-
-@app.route('/date', methods=['GET', 'POST'])
+@app.route('/date', methods=['GET'])
 @login_required
 def date():
+    begin = request.args['begin'].strip()
+    end = request.args['end'].strip()
     results = None
-    begin = None
-    end = None
 
-    if request.method == 'POST':
-        begin = request.form['begin'].strip()
-        end = request.form['end'].strip()
-        c = get_db().cursor()
-        results = do_query(c, 'SELECT personae.name, award_types.name, awards.date, crowns.name, events.name FROM personae JOIN awards ON personae.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id JOIN events ON awards.event_id = events.id LEFT OUTER JOIN crowns ON awards.crown_id = crowns.id WHERE date(?) <= date(awards.date) AND date(awards.date) <= date(?) ORDER BY awards.date, personae.name, award_types.name', begin, end)
+    c = get_db().cursor()
+    results = do_query(c, 'SELECT personae.name, award_types.name, awards.date, crowns.name, events.name FROM personae JOIN awards ON personae.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id JOIN events ON awards.event_id = events.id LEFT OUTER JOIN crowns ON awards.crown_id = crowns.id WHERE date(?) <= date(awards.date) AND date(awards.date) <= date(?) ORDER BY awards.date, personae.name, award_types.name', begin, end)
 
     return render_template(
         'date.html',
@@ -227,11 +181,38 @@ def date():
     )
 
 
-@app.route('/reign', methods=['GET', 'POST'])
+@app.route('/award', methods=['GET'])
 @login_required
-def reign():
+def award():
+    award = request.args['award'].strip()
+    results = None
+
+    c = get_db().cursor()
+    results = do_query(c, 'SELECT personae.name, award_types.name, awards.date, crowns.name, events.name FROM personae JOIN awards ON personae.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id JOIN events ON awards.event_id = events.id LEFT OUTER JOIN crowns ON awards.crown_id = crowns.id WHERE award_types.name LIKE ? ORDER BY awards.date, personae.name, award_types.name', '%{}%'.format(award))
+
     return render_template(
-        'front.html'
+        'award.html',
+        award=award,
+        results=results
+    )
+
+
+@app.route('/crown', methods=['GET'])
+@login_required
+def crown():
+    crown_id = request.args['crown_id']
+    results = None
+
+    c = get_db().cursor()
+
+    crown = do_query(c, 'SELECT name FROM crowns WHERE id = ?', crown_id)[0][0]
+
+    results = do_query(c, 'SELECT personae.name, award_types.name, awards.date, crowns.name, events.name FROM personae JOIN awards ON personae.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id JOIN events ON awards.event_id = events.id JOIN crowns ON awards.crown_id = crowns.id WHERE crowns.id = ? ORDER BY awards.date, personae.name, award_types.name', crown_id)
+
+    return render_template(
+        'crown.html',
+        crown=crown,
+        results=results
     )
 
 
@@ -271,10 +252,27 @@ def op():
 @login_required
 def reigns():
     c = get_db().cursor()
-    results = do_query(c, 'SELECT sov1 || " and " || sov2, begin, end FROM reigns ORDER BY begin')
+    principality = do_query(c, 'SELECT sov1 || " and " || sov2, begin, end FROM reigns WHERE date(begin) < date("1993-06-05") ORDER BY begin')
+    kingdom = do_query(c, 'SELECT sov1 || " and " || sov2, begin, end FROM reigns WHERE date(begin) >= date("1993-06-05") ORDER BY begin')
 
     return render_template(
         'reigns.html',
+        principality=principality,
+        kingdom=kingdom
+    )
+
+
+# TODO: make an alphabetic index
+
+@app.route('/armorial', methods=['GET'])
+@login_required
+def armorial():
+    c = get_db().cursor()
+    results = do_query(c, 'SELECT p2.name, people.emblazon FROM people JOIN personae AS p1 ON p1.person_id = people.id JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id WHERE people.emblazon IS NOT NULL GROUP BY p2.person_id HAVING awards.date = MAX(awards.date) ORDER BY p2.name')
+
+    return render_template(
+        'armorial.html',
+        columns=6,
         results=results
     )
 
@@ -288,6 +286,92 @@ def backlog():
     return render_template(
         'backlog.html',
         results=results
+    )
+
+
+# TODO
+@app.route('/search', methods=['GET', 'POST'])
+@login_required
+def search():
+    try:
+        if request.method == 'POST':
+            persona = request.form['persona'].strip()
+            prename = request.form['prename'].strip()
+            surname = request.form['surname'].strip()
+            begin = request.form['begin'].strip()
+            end = request.form['end'].strip()
+            crown = request.form['crown'].strip()
+            award = request.form['award'].strip()
+
+            if prename or surname:
+                if persona or begin or end or crown or award:
+                    # error
+                    raise Exception
+
+                c = get_db().cursor()
+
+                qhead = 'SELECT id, surname, prename FROM people WHERE '
+
+                if surname:
+                    if prename:
+                        matches = do_query(c, qhead + 'surname LIKE ? AND prename LIKE ?', '%{}%'.format(surname), '%{}%'.format(prename))
+                    else:
+                        matches = do_query(c, qhead + 'surname LIKE ?', '%{}%'.format(surname))
+                else:
+                    matches = do_query(c, qhead + 'prename LIKE ?', '%{}%'.format(prename))
+
+                if len(matches) == 1:
+                    return redirect(url_for(
+                        'person',
+                        surname=matches[0][1],
+                        prename=matches[0][2]
+                    ))
+                else:
+                    return render_template('choose_person.html', matches=matches)
+
+            elif persona:
+                if prename or surname or begin or end or crown or award:
+                    # error
+                    raise Exception
+                
+                c = get_db().cursor()
+                matches = do_query(c, 'SELECT id, name FROM personae WHERE name LIKE ?', '%{}%'.format(persona))
+
+                if len(matches) == 1:
+                    return redirect(url_for('persona', name=matches[0][1]))
+                else:
+                    return render_template('choose_persona.html', matches=matches)
+
+            elif begin or end:
+                if prename or surname or persona or crown or award:
+                    # error
+                    raise Exception
+
+                return redirect(url_for('date', begin=begin, end=end))
+      
+            elif crown:
+                if prename or surname or persona or begin or end or award:
+                    # error
+                    raise Exception
+
+                return redirect(url_for('crown', crown_id=crown))
+
+            elif award:
+                if prename or surname or persona or begin or end or crown:
+                    # error
+                    raise Exception
+
+                return redirect(url_for('award', award=award))
+
+    except:
+        pass 
+
+    c = get_db().cursor()
+    crowns = do_query(c, 'SELECT id, name FROM crowns ORDER BY name')
+ 
+    return render_template(
+        'search.html',
+        crowns=crowns
     )
 
 

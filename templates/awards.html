@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}Search by Award{% endblock %}
+{% block content %}
+<div id="content">
+  <h1>Awards</h1>
+  {% if results %}
+  <table>
+    {% for i in results -%}
+    <tr>
+      <td>{{i[0]}}</td>
+      <td>{{i[1]}}</td>
+      <td>{{i[2]}}</td>
+    </tr>
+    {% endfor -%}
+  </table>
+  {% endif %}
+
+  <form method="post">
+    <table>
+      <tr><th>SCA awards</th></tr>
+      {% for i in awards_sca %} 
+      <tr>
+        <td><input type="checkbox" name="{{i[0]}}"/></td>
+        <th><label for="{{i[0]}}">{{i[1]}}</label></th>
+      </tr>
+      {% endfor %}
+
+      <tr><th>Drachenwald awards</th></tr>
+      {% for i in awards_dw %} 
+      <tr>
+        <td><input type="checkbox" name="{{i[0]}}"/></td>
+        <th><label for="{{i[0]}}">{{i[1]}}</label></th>
+      </tr>
+      {% endfor %}
+
+      <tr><th>Principality awards</th></tr>
+      <tr><th>Insulae Draconis awards</th></tr>
+      {% for i in awards_id %} 
+      <tr>
+        <td><input type="checkbox" name="{{i[0]}}"/></td>
+        <th><label for="{{i[0]}}">{{i[1]}}</label></th>
+      </tr>
+      {% endfor %}
+
+      <tr><th>Nordmark awards</th></tr>
+      {% for i in awards_nm %} 
+      <tr>
+        <td><input type="checkbox" name="{{i[0]}}"/></td>
+        <th><label for="{{i[0]}}">{{i[1]}}</label></th>
+      </tr>
+      {% endfor %}
+
+      <tr><th>Baronial awards</th></tr>
+
+      <tr><th>Aarnimetsä awards</th></tr>
+      {% for i in awards_aa %} 
+      <tr>
+        <td><input type="checkbox" name="{{i[0]}}"/></td>
+        <th><label for="{{i[0]}}">{{i[1]}}</label></th>
+      </tr>
+      {% endfor %}
+
+      <tr><th>Knight's Crossing awards</th></tr>
+      {% for i in awards_kc %} 
+      <tr>
+        <td><input type="checkbox" name="{{i[0]}}"/></td>
+        <th><label for="{{i[0]}}">{{i[1]}}</label></th>
+      </tr>
+      {% endfor %}
+
+      <tr><th>Styringheim awards</th></tr>
+      {% for i in awards_st %} 
+      <tr>
+        <td><input type="checkbox" name="{{i[0]}}"/></td>
+        <th><label for="{{i[0]}}">{{i[1]}}</label></th>
+      </tr>
+      {% endfor %}
+
+      <tr><th>Gotvik awards</th></tr>
+      {% for i in awards_gv %}
+      <tr>
+        <td><input type="checkbox" name="{{i[0]}}"/></td>
+        <th><label for="{{i[0]}}">{{i[1]}}</label></th>
+      </tr>
+      {% endfor %}
+
+<!--
+      <tr>
+        <td>
+          <input type="radio" name="binop" id="union" value="union"/>
+          <label for="union">Union</label>
+        </td>
+        <td>
+          <input type="radio" name="binop" id="intersection" value="intersection"/>
+          <label for="intersection">Intersection</label>
+        </td>
+      </tr>
+-->
+
+      <tr>
+        <td/>
+        <td>
+          <button type="submit" value="Search">Search</button>
+          <button type="reset" value="Reset">Reset</button>
+        </td>
+      </tr>
+    </table>
+  </form>
+</div>
+{% endblock %}

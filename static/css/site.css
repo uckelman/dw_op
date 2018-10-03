@@ -54,6 +54,25 @@ th {
   margin: 0 2em 1em 0;
 }
 
+#armorial {
+}
+
+#armorial td {
+  padding: 0.75em 0.25em;
+  vertical-align: top;
+}
+
+.emblazon_small {
+/*  display: inline-block; */
+  text-align: center;
+}
+
+.emblazon_small img {
+  display: block;
+  height: 5em;
+  margin: 0 auto;
+}
+
 .noarms {
   height: 159px;
   width: 133px;
@@ -71,7 +90,7 @@ th {
 table.op {
   border-collapse: collapse;
   border-spacing: 0;
-  font-variant-numeric: lining-nums tabular-nums;
+/*  font-variant-numeric: lining-nums tabular-nums; */
 }
 
 table.op th {
@@ -101,7 +120,7 @@ table.op tbody + tbody th:first-child {
 table.results {
   border-collapse: collapse;
   border-spacing: 0;
-  font-variant-numeric: lining-nums tabular-nums;
+/*  font-variant-numeric: lining-nums tabular-nums; */
 /*  width: 100%; */
 }
 
@@ -128,6 +147,20 @@ table.results th, table.results td {
 table.results thead th {
   font-weight: bold;
   text-align: left;
+}
+
+table.searchform th {
+  text-align: right;
+  padding: 0.25em 0 0.125em 0.5em;
+}
+
+table.searchform td {
+  padding: 0.25em 0.5em 0.125em 0.5em;
+}
+
+.orsep {
+  font-weight: bold;
+  font-variant: small-caps; 
 }
 
 #foot_nav, #head_nav {

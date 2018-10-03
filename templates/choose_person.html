@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Drachenwald OP - Search by Name{% endblock %}
+{% block content %}
+<div id="content">
+  {% if matches %}
+  <table>
+    {% for i in matches %}
+    <tr>
+      <td><a href="{{ url_for('person', surname=i[1], prename=i[2]) }}">{{i[2]}} {{i[1]}}</a></td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% endif %}
+</div>
+{% endblock %}
