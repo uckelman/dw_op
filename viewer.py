@@ -76,6 +76,12 @@ def front():
     )
 
 
+@app.route('/privacy')
+def privacy():
+    return render_template(
+        'privacy.html'
+    )
+
 # FIXME: always display with most recent name
 # FIXME: clean up queries
 
