@@ -1,0 +1,36 @@
+{% macro awardlist(results) -%}
+  <div id="awards">
+    <table class="results">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Award</th>
+          <th>Date</th>
+          <th>Crown</th>
+          <th>Event</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for i in results -%}
+        <tr>
+          <td>{{ caller(i[0]) }}</td>
+          <td>{{i[1]}}</td>
+          <td>{{i[2]}}</td>
+          <td>{{i[3]}}</td>
+          <td>{{i[4]}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{%- endmacro %}
+
+{% macro navlist() -%}
+  <ul class="mhlist">
+    <li><a href="{{ url_for('search') }}">Search</a></li>
+    <li><a href="{{ url_for('awards') }}">Awards</a></li>
+    <li><a href="{{ url_for('op') }}">OP</a></li>
+    <li><a href="{{ url_for('reigns') }}">Reigns</a></li>
+    <li><a href="{{ url_for('armorial') }}">Armorial</a></li>
+  </ul>
+{%- endmacro %}
