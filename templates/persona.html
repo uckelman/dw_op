@@ -19,30 +19,8 @@
     bearing arms of {{blazon}}
     {% endif %}
   </div>
-  <div id="awards">
-    {% if awards %}
-    <table class="results">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Award</th>
-          <th>Date</th>
-          <th>Crown</th>
-          <th>Event</th>
-        </tr>
-      </thead>
-      <tbody>
-        </tr>
-        {% for i in awards -%}
-        <tr>
-          {% for j in i %}
-          <td>{{j}}</td>
-          {% endfor -%}
-        </tr>
-        {% endfor -%}
-      </tbody>
-    </table>
-    {% endif %}
-  </div>
+  {% call(name) macros.awardlist(awards) -%}
+    {{name}}
+  {%- endcall %}
 </div>
 {% endblock %}

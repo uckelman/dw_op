@@ -5,7 +5,7 @@ import os
 import sqlite3
 import traceback
 
-from flask import Flask, g, redirect, render_template, request, url_for
+from flask import Flask, flash, g, redirect, render_template, request, url_for
 
 from auth import User, handle_login, handle_logout, login_required
 
@@ -86,7 +86,6 @@ def privacy():
 # FIXME: clean up queries
 
 @app.route('/persona/<name>', methods=['GET'])
-@login_required
 def persona(name):
     c = get_db().cursor()
 
@@ -101,7 +100,7 @@ def persona(name):
     if emblazon:
         emblazon = '<img class="emblazon" src="{}"/>'.format(url_for('static', filename='images/arms/' + emblazon))
     else:
-        emblazon = '<div class="emblazon noarms"><div>I have not given<br/>Post Horn my<br/> arms. I am a<br/> bad person.</div></div>'
+        emblazon = '<div class="emblazon noarms"><div>I have not given<br/>Post Horn my<br/> registered<br/> arms.</div></div>'
 
     awards = do_query(c, 'SELECT p2.name, award_types.name, awards.date, crowns.name, events.name FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id JOIN events ON awards.event_id = events.id LEFT OUTER JOIN crowns ON awards.crown_id = crowns.id WHERE p1.name = ? ORDER BY awards.date, award_types.name', name)
 
@@ -120,7 +119,6 @@ def persona(name):
 # FIXME: fails with just one name component
 
 @app.route('/person/<surname>/<prename>', methods=['GET'])
-@login_required
 def person(surname, prename):
     c = get_db().cursor()
 
@@ -137,7 +135,6 @@ def person(surname, prename):
 # TODO: add checkbox for name when given vs name last used?
 
 @app.route('/awards', methods=['GET', 'POST'])
-@login_required
 def awards():
     results = None
 
@@ -153,7 +150,7 @@ def awards():
 
     if request.method == 'POST':
         a_ids = [int(v) for v in request.form if v.isdigit()]
-        results = do_query(c, 'SELECT personae.name, award_types.name, awards.date FROM awards JOIN personae ON awards.persona_id = personae.id JOIN award_types ON awards.type_id = award_types.id WHERE award_types.id IN ({}) ORDER BY awards.date, personae.name'.format(','.join(['?'] * len(a_ids))), *a_ids)
+        results = do_query(c, 'SELECT personae.name, award_types.name, awards.date, crowns.name, events.name FROM awards JOIN personae ON awards.persona_id = personae.id JOIN award_types ON awards.type_id = award_types.id JOIN events ON awards.event_id = events.id LEFT OUTER JOIN crowns ON awards.crown_id = crowns.id WHERE award_types.id IN ({}) ORDER BY awards.date, personae.name, award_types.name'.format(','.join(['?'] * len(a_ids))), *a_ids)
 
     return render_template(
         'awards.html',
@@ -170,7 +167,6 @@ def awards():
 
 
 @app.route('/date', methods=['GET'])
-@login_required
 def date():
     begin = request.args['begin'].strip()
     end = request.args['end'].strip()
@@ -188,7 +184,6 @@ def date():
 
 
 @app.route('/award', methods=['GET'])
-@login_required
 def award():
     award = request.args['award'].strip()
     results = None
@@ -204,7 +199,6 @@ def award():
 
 
 @app.route('/crown', methods=['GET'])
-@login_required
 def crown():
     crown_id = request.args['crown_id']
     results = None
@@ -223,15 +217,14 @@ def crown():
 
 
 @app.route('/op', methods=['GET', 'POST'])
-@login_required
 def op():
     headers = None
     results = None
 
     if request.method == 'POST':
-        min_precedence = request.form['precedence']
+        min_precedence = int(request.form['precedence'].strip())
         c = get_db().cursor()
-        results = do_query(c, 'SELECT mrp.name, awards.date, MAX(award_types.precedence) FROM awards JOIN personae ON awards.persona_id = personae.id JOIN award_types ON awards.type_id = award_types.id JOIN (SELECT personae.person_id, personae.name, MAX(awards.date) FROM personae JOIN awards ON personae.id = awards.persona_id GROUP BY personae.person_id ORDER BY personae.name) AS mrp ON mrp.person_id = personae.person_id WHERE award_types.precedence >= ? GROUP BY mrp.person_id ORDER BY award_types.precedence DESC, awards.date, mrp.name', min_precedence)
+        results = do_query(c, 'SELECT DISTINCT cur.name, awards.date, award_types.precedence FROM awards JOIN personae ON awards.persona_id = personae.id JOIN award_types ON awards.type_id = award_types.id LEFT JOIN (SELECT personae.person_id, awards.date, award_types.precedence FROM awards JOIN personae ON awards.persona_id = personae.id JOIN award_types ON awards.type_id = award_types.id) AS pjoin ON personae.person_id = pjoin.person_id AND award_types.precedence < pjoin.precedence LEFT JOIN (SELECT personae.person_id, awards.date, award_types.precedence FROM awards JOIN personae ON awards.persona_id = personae.id JOIN award_types ON awards.type_id = award_types.id) AS djoin ON personae.person_id = djoin.person_id AND award_types.precedence = djoin.precedence AND awards.date > djoin.date JOIN (SELECT DISTINCT personae.name, personae.person_id FROM awards JOIN personae ON awards.persona_id = personae.id LEFT JOIN (SELECT personae.person_id, awards.persona_id, awards.date FROM awards JOIN personae ON awards.persona_id = personae.id) AS sjoin ON personae.person_id = sjoin.person_id AND awards.date < sjoin.date WHERE sjoin.date IS NULL) AS cur ON cur.person_id = personae.person_id WHERE pjoin.precedence IS NULL AND djoin.date IS NULL AND award_types.precedence >= ? ORDER BY award_types.precedence DESC, awards.date, cur.name', min_precedence)
 
         headers = {
             1000: 'Duchy',
@@ -255,7 +248,6 @@ def op():
 
 
 @app.route('/reigns', methods=['GET'])
-@login_required
 def reigns():
     c = get_db().cursor()
     principality = do_query(c, 'SELECT sov1 || " and " || sov2, begin, end FROM reigns WHERE date(begin) < date("1993-06-05") ORDER BY begin')
@@ -269,9 +261,9 @@ def reigns():
 
 
 # TODO: make an alphabetic index
+# FIXME: returning field not in the GROUP BY?
 
 @app.route('/armorial', methods=['GET'])
-@login_required
 def armorial():
     c = get_db().cursor()
     results = do_query(c, 'SELECT p2.name, people.emblazon FROM people JOIN personae AS p1 ON p1.person_id = people.id JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id WHERE people.emblazon IS NOT NULL GROUP BY p2.person_id HAVING awards.date = MAX(awards.date) ORDER BY p2.name')
@@ -297,7 +289,6 @@ def backlog():
 
 # TODO
 @app.route('/search', methods=['GET', 'POST'])
-@login_required
 def search():
     try:
         if request.method == 'POST':

@@ -1,3 +1,4 @@
+{% import "macros.html" as macros %}
 <!doctype html>
 <html lang="en-US">
 <head>
@@ -11,29 +12,23 @@
   {% block flash %}{% endblock %}
   {% block header %}
   <header>
-    <nav id="head_nav">
-      <ul class="mhlist">
-        <li><a href="{{ url_for('search') }}">Search</a></li>
-        <li><a href="{{ url_for('awards') }}">Awards</a></li>
-        <li><a href="{{ url_for('op') }}">OP</a></li>
-        <li><a href="{{ url_for('reigns') }}">Reigns</a></li>
-        <li><a href="{{ url_for('armorial') }}">Armorial</a></li>
-        <li><a href="{{ url_for('logout') }}">Logout</a></li>
-      </ul>
-    </nav>
+    <img class="dwarms_l" src="{{ url_for('static', filename='images/arms/dwarms.png') }}"/><div class="hslug">
+      <nav id="head_nav">
+        {{ macros.navlist() }}
+      </nav>
+      <div id="opbar">Drachenwald Order of Precedence</div>
+    </div><img class="dwarms_r" src="{{ url_for('static', filename='images/arms/dwarms.png') }}"/>
   </header>
   {% endblock %}
   {% block content %}{% endblock %}
   {% block footer %}
   <footer>
     <nav id="foot_nav">
-      <ul class="mhlist">
-        <li><a href="{{ url_for('search') }}">Search</a></li>
-        <li><a href="{{ url_for('awards') }}">Awards</a></li>
-        <li><a href="{{ url_for('reigns') }}">Reigns</a></li>
-        <li><a href="{{ url_for('op') }}">OP</a></li>
-        <li><a href="{{ url_for('armorial') }}">Armorial</a></li>
-      </ul>
+      {{ macros.navlist() }}
+    </nav>
+
+    <nav id="other_nav">
+      <a href="{{ url_for('privacy') }}">Privacy Policy</a>
     </nav>
   </footer>
   {% endblock %}

@@ -2,33 +2,9 @@
 {% block title %}Search by Date{% endblock %}
 {% block content %}
 <div id="content">
-  {% if results %}
   <h1>Awards {{begin}}&ndash;{{end}}</h1>
-
-  <div id="awards">
-    <table class="results">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Award</th>
-          <th>Date</th>
-          <th>Crown</th>
-          <th>Event</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for i in results -%}
-        <tr>
-          <td><a href="{{ url_for('persona', name=i[0]) }}">{{i[0]}}</a></td>
-          <td>{{i[1]}}</td>
-          <td>{{i[2]}}</td>
-          <td>{{i[3]}}</td>
-          <td>{{i[4]}}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-  {% endif %}
+  {% call(name) macros.awardlist(results) -%}
+    <a href="{{ url_for('persona', name=name) }}">{{name}}</a>
+  {%- endcall %}
 </div>
 {% endblock %}

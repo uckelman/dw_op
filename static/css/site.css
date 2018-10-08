@@ -24,6 +24,35 @@ body {
   margin: 2em 1em 2em 2em;
 }
 
+header {
+  margin: 1em 0;
+  text-align: center;
+}
+
+.hslug {
+  display: inline-block;
+}
+
+.dwarms_l {
+  height: 3.75em;
+  margin: 0 0.75em;
+  display: inline-block;
+  vertical-align: bottom;
+}
+
+.dwarms_r {
+  height: 3.75em;
+  margin: 0 0.75em;
+  display: inline-block;
+  vertical-align: bottom;
+}
+
+#opbar {
+  font-weight: bold;
+  font-size: 1.5em;
+  text-align: center;
+}
+
 #details {
   margin: 1em 0;
 }
@@ -42,6 +71,15 @@ a:hover {
   transition-property: background;
   transition-duration: 0.2s;
   border-radius: 8px;
+}
+
+p {
+  margin-bottom: 1em;
+
+  text-align: justify;
+  text-justify: inter-word;
+  word-wrap: break-word;
+  hyphens: auto;
 }
 
 th {
@@ -164,11 +202,18 @@ table.searchform td {
 }
 
 #foot_nav, #head_nav {
-  margin-top: 1em;
-  margin-bottom: 1em;
   font-variant: small-caps;
   text-align: center;
 /* font-family: 'IM Fell English SC', serif; */
+}
+
+#head_nav {
+/*  margin-bottom: 0.5em; */
+}
+
+#foot_nav {
+  margin-top: 1em;
+  margin-bottom: 1em;
 }
 
 #foot_nav ul.mhlist, #head_nav ul.mhlist {
@@ -177,6 +222,15 @@ table.searchform td {
 
 #foot_nav ul.mhlist li:before, #head_nav ul.mhlist li:before {
   margin: 0 0.5em;
+}
+
+#foot_nav ul.mhlist li:first-child::before, #head_nav ul.mhlist li:first-child::before {
+  margin: 0;
+}
+
+#other_nav {
+  float: right;
+  margin-right: 1em;
 }
 
 ul.mhlist {
