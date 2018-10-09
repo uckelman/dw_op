@@ -287,85 +287,91 @@ def backlog():
     )
 
 
-# TODO
+class FormError(Exception):
+  def __init__(self, message):
+    super(FormError, self).__init__()
+    self.message = message
+
+
+def search_modern(c, surname, forename):
+    query = 'SELECT id, surname, forename FROM people WHERE '
+
+    if surname:
+        if forename:
+            query += 'surname LIKE ? AND forename LIKE ?'
+            params = ('%{}%'.format(surname), '%{}%'.format(forename))
+        else:
+            query += 'surname LIKE ?'
+            params = ('%{}%'.format(surname),)
+    else:
+        query += 'forename LIKE ?'
+        params = ('%{}%'.format(forename),)
+
+    matches = do_query(c, query, *params)
+
+    if len(matches) == 1:
+        return redirect(url_for(
+            'person',
+            surname=matches[0][1],
+            forename=matches[0][2]
+        ))
+    else:
+        return render_template('choose_person.html', matches=matches)
+
+
+def search_persona(c, persona):
+    matches = do_query(c, 'SELECT id, name FROM personae WHERE name LIKE ?', '%{}%'.format(persona))
+
+    if len(matches) == 1:
+        return redirect(url_for('persona', name=matches[0][1]))
+    else:
+        return render_template('choose_persona.html', matches=matches)
+
+
+def throw_if(*args):
+    if any(args):
+        raise FormError('Choose a single type of search.')
+
+
+def get_crowns_list(c):
+    return do_query(c, 'SELECT id, name FROM crowns ORDER BY name')
+
+
+def stripped(d, k):
+    return d.get(k, default='').strip() or None
+
+
 @app.route('/search', methods=['GET', 'POST'])
 def search():
-    try:
-        if request.method == 'POST':
-            persona = request.form['persona'].strip()
-            forename = request.form['forename'].strip()
-            surname = request.form['surname'].strip()
-            begin = request.form['begin'].strip()
-            end = request.form['end'].strip()
-            crown = request.form['crown'].strip()
-            award = request.form['award'].strip()
+    if request.method == 'POST':
+        persona = stripped(request.form, 'persona')
+        forename = stripped(request.form, 'forename')
+        surname = stripped(request.form, 'surname')
+        begin = stripped(request.form, 'begin')
+        end = stripped(request.form, 'end')
+        crown = stripped(request.form, 'crown')
+        award = stripped(request.form, 'award')
 
+        try:
             if forename or surname:
-                if persona or begin or end or crown or award:
-                    # error
-                    raise Exception
-
-                c = get_db().cursor()
-
-                qhead = 'SELECT id, surname, forename FROM people WHERE '
-
-                if surname:
-                    if forename:
-                        matches = do_query(c, qhead + 'surname LIKE ? AND forename LIKE ?', '%{}%'.format(surname), '%{}%'.format(forename))
-                    else:
-                        matches = do_query(c, qhead + 'surname LIKE ?', '%{}%'.format(surname))
-                else:
-                    matches = do_query(c, qhead + 'forename LIKE ?', '%{}%'.format(forename))
-
-                if len(matches) == 1:
-                    return redirect(url_for(
-                        'person',
-                        surname=matches[0][1],
-                        forename=matches[0][2]
-                    ))
-                else:
-                    return render_template('choose_person.html', matches=matches)
-
+                throw_if(persona, begin, end, crown, award)
+                return search_modern(get_db().cursor(), surname, forename)
             elif persona:
-                if forename or surname or begin or end or crown or award:
-                    # error
-                    raise Exception
-                
-                c = get_db().cursor()
-                matches = do_query(c, 'SELECT id, name FROM personae WHERE name LIKE ?', '%{}%'.format(persona))
-
-                if len(matches) == 1:
-                    return redirect(url_for('persona', name=matches[0][1]))
-                else:
-                    return render_template('choose_persona.html', matches=matches)
-
+                throw_if(forename, surname, begin, end, crown, award)
+                return search_persona(get_db().cursor(), persona)
             elif begin or end:
-                if forename or surname or persona or crown or award:
-                    # error
-                    raise Exception
-
+                throw_if(forename, surname, persona, crown, award)
                 return redirect(url_for('date', begin=begin, end=end))
-      
             elif crown:
-                if forename or surname or persona or begin or end or award:
-                    # error
-                    raise Exception
-
+                throw_if(forename, surname, persona, begin, end, award)
                 return redirect(url_for('crown', crown_id=crown))
-
             elif award:
-                if forename or surname or persona or begin or end or crown:
-                    # error
-                    raise Exception
-
+                throw_if(prename, surname, persona, begin, end, crown)
                 return redirect(url_for('award', award=award))
+        except Exception as e:
+            flash(e.message, 'error')
 
-    except:
-        pass 
-
-    c = get_db().cursor()
-    crowns = do_query(c, 'SELECT id, name FROM crowns ORDER BY name')
- 
+    crowns = get_crowns_list(get_db().cursor())
     return render_template(
         'search.html',
         crowns=crowns

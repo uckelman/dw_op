@@ -201,6 +201,17 @@ table.searchform td {
   font-variant: small-caps; 
 }
 
+.disabled {
+  color: #cccccc;
+}
+
+.error {
+  border: 2px solid red;
+  border-radius: 5px;
+  background-color: #ffaaaa;
+  padding: 0.25em;
+}
+
 #foot_nav, #head_nav {
   font-variant: small-caps;
   text-align: center;

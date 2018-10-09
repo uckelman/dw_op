@@ -3,6 +3,21 @@
 {% block content %}
 <div id="content">
   <h1>Searches</h1>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="flashes">
+  {% for category, message in messages %}
+    {% if category == 'error' %}
+    <div class="error"><strong>Error:</strong> {{ message }}</div>
+    {% else %}
+    <div class="{{ category }}">{{ message }}</div>
+    {% endif %}
+  {% endfor %}
+  </div>
+  {% endif %}
+  {% endwith %}
+
   <form method="post">
     <table class="searchform">
       <tr>
@@ -10,7 +25,7 @@
           <label for="persona">Persona</label>
         </th>
         <td>
-          <input type="text" name="persona"/>
+          <input id="persona" name="persona" type="text"/>
         </td>
       </tr>
       <tr>
@@ -21,13 +36,13 @@
           <label for="forename">Forename</label>
         </th>
         <td>
-          <input type="text" name="forename"/>
+          <input id="forename" name="forename" type="text"/>
         </td>
         <th>
           <label for="surname">Surname</label>
         </th>
         <td>
-          <input type="text" name="surname"/>
+          <input id="surname" name="surname" type="text"/>
         </td>
       </tr>
       <tr>
@@ -38,7 +53,7 @@
           <label for="begin">Date range</label>
         </th>
         <td colspan="3">
-          <input type="text" name="begin" placeholder="YYYY-MM-DD"/> &ndash; <input type="text" name="end" placeholder="YYYY-MM-DD"/>
+          <input id="begin" name="begin" type="text" placeholder="YYYY-MM-DD" pattern="[12]\d{3}-[01]\d-[0-3]\d"/> &ndash; <input id="end" name="end" type="text" placeholder="YYYY-MM-DD" pattern="[12]\d{3}-[01]\d-[0-3]\d"/>
         </td>
       </tr>
       <tr>
@@ -49,7 +64,7 @@
           <label for="crown">Crown</label>
         </th>
         <td colspan="3">
-          <select name="crown">
+          <select id="crown" name="crown">
             <option value=""/>
           {% for i in crowns %}
             <option value="{{i[0]}}">{{i[1]}}</option>  
@@ -65,17 +80,19 @@
           <label for="award">Award</label>
         </th>
         <td>
-          <input type="text" name="award"/>
+          <input id="award" name="award" type="text"/>
         </td>
       </tr>
       <tr>
         <td/>
         <td>
-          <button type="submit" value="Search">Search</button>
-          <button type="reset" value="Reset">Reset</button>
+          <button id="submit" type="submit" value="Search">Search</button>
+          <button id="reset" type="reset" value="Reset">Reset</button>
         </td>
       </tr>
     </table>
   </form>
 </div>
+
+<script src="{{ url_for('static', filename='js/form.js') }}" type="application/javascript"></script>
 {% endblock %}
