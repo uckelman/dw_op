@@ -2,6 +2,7 @@
 {% block title %}Drachenwald OP - Search by Name{% endblock %}
 {% block content %}
 <div id="content">
+  {% if matches %}
   <h1>Several names match your query</h1>
   <table>
     {% for i in matches %}
@@ -10,5 +11,8 @@
     </tr>
     {% endfor %}
   </table>
+  {% else %}
+  <h1>No names match your query</h1>
+  {% endif %}
 </div>
 {% endblock %}
