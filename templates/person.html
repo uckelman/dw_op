@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-{% block title %}Drachenwald OP - {{prename}} {{surname}}{% endblock %}
+{% block title %}Drachenwald OP - {{forename}} {{surname}}{% endblock %}
 {% block content %}
 <div id="content">
   <div id="details">
-    <h1>{{prename}}{{ ' ' if prename and surname}}{{surname}}</h1>
+    <h1>{{forename}}{{ ' ' if forename and surname}}{{surname}}</h1>
   </div>
   <div id="awards">
     {% if awards %}

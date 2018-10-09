@@ -89,7 +89,7 @@ def privacy():
 def persona(name):
     c = get_db().cursor()
 
-    person_id, has_modname, region, blazon, emblazon = do_query(c, 'SELECT people.id, people.surname IS NOT NULL OR people.prename IS NOT NULL, regions.name, people.blazon, people.emblazon FROM personae JOIN people ON personae.person_id = people.id JOIN regions ON people.region_id = regions.id WHERE personae.name = ?', name)[0]
+    person_id, has_modname, region, blazon, emblazon = do_query(c, 'SELECT people.id, people.surname IS NOT NULL OR people.forename IS NOT NULL, regions.name, people.blazon, people.emblazon FROM personae JOIN people ON personae.person_id = people.id JOIN regions ON people.region_id = regions.id WHERE personae.name = ?', name)[0]
 
     cur_id, curname, _ = do_query(c, 'SELECT personae.id, personae.name, MAX(awards.date) FROM awards JOIN personae ON awards.persona_id = personae.id JOIN people ON people.id = personae.person_id WHERE people.id = ?', person_id)[0];
 
@@ -118,16 +118,16 @@ def persona(name):
 
 # FIXME: fails with just one name component
 
-@app.route('/person/<surname>/<prename>', methods=['GET'])
-def person(surname, prename):
+@app.route('/person/<surname>/<forename>', methods=['GET'])
+def person(surname, forename):
     c = get_db().cursor()
 
-    awards = do_query(c, 'SELECT award_types.name, awards.date, crowns.name, events.name FROM awards JOIN personae ON awards.persona_id = personae.id JOIN people ON personae.person_id = people.id JOIN award_types ON awards.type_id = award_types.id JOIN events ON awards.event_id = events.id LEFT OUTER JOIN crowns ON awards.crown_id = crowns.id WHERE people.surname = ? AND people.prename = ? ORDER BY awards.date, award_types.name', surname, prename)
+    awards = do_query(c, 'SELECT award_types.name, awards.date, crowns.name, events.name FROM awards JOIN personae ON awards.persona_id = personae.id JOIN people ON personae.person_id = people.id JOIN award_types ON awards.type_id = award_types.id JOIN events ON awards.event_id = events.id LEFT OUTER JOIN crowns ON awards.crown_id = crowns.id WHERE people.surname = ? AND people.forename = ? ORDER BY awards.date, award_types.name', surname, forename)
 
     return render_template(
         'person.html',
         surname=surname,
-        prename=prename,
+        forename=forename,
         awards=awards
     )
 
@@ -293,41 +293,41 @@ def search():
     try:
         if request.method == 'POST':
             persona = request.form['persona'].strip()
-            prename = request.form['prename'].strip()
+            forename = request.form['forename'].strip()
             surname = request.form['surname'].strip()
             begin = request.form['begin'].strip()
             end = request.form['end'].strip()
             crown = request.form['crown'].strip()
             award = request.form['award'].strip()
 
-            if prename or surname:
+            if forename or surname:
                 if persona or begin or end or crown or award:
                     # error
                     raise Exception
 
                 c = get_db().cursor()
 
-                qhead = 'SELECT id, surname, prename FROM people WHERE '
+                qhead = 'SELECT id, surname, forename FROM people WHERE '
 
                 if surname:
-                    if prename:
-                        matches = do_query(c, qhead + 'surname LIKE ? AND prename LIKE ?', '%{}%'.format(surname), '%{}%'.format(prename))
+                    if forename:
+                        matches = do_query(c, qhead + 'surname LIKE ? AND forename LIKE ?', '%{}%'.format(surname), '%{}%'.format(forename))
                     else:
                         matches = do_query(c, qhead + 'surname LIKE ?', '%{}%'.format(surname))
                 else:
-                    matches = do_query(c, qhead + 'prename LIKE ?', '%{}%'.format(prename))
+                    matches = do_query(c, qhead + 'forename LIKE ?', '%{}%'.format(forename))
 
                 if len(matches) == 1:
                     return redirect(url_for(
                         'person',
                         surname=matches[0][1],
-                        prename=matches[0][2]
+                        forename=matches[0][2]
                     ))
                 else:
                     return render_template('choose_person.html', matches=matches)
 
             elif persona:
-                if prename or surname or begin or end or crown or award:
+                if forename or surname or begin or end or crown or award:
                     # error
                     raise Exception
                 
@@ -340,21 +340,21 @@ def search():
                     return render_template('choose_persona.html', matches=matches)
 
             elif begin or end:
-                if prename or surname or persona or crown or award:
+                if forename or surname or persona or crown or award:
                     # error
                     raise Exception
 
                 return redirect(url_for('date', begin=begin, end=end))
       
             elif crown:
-                if prename or surname or persona or begin or end or award:
+                if forename or surname or persona or begin or end or award:
                     # error
                     raise Exception
 
                 return redirect(url_for('crown', crown_id=crown))
 
             elif award:
-                if prename or surname or persona or begin or end or crown:
+                if forename or surname or persona or begin or end or crown:
                     # error
                     raise Exception
 
