@@ -196,11 +196,6 @@ table.searchform td {
   padding: 0.25em 0.5em 0.125em 0.5em;
 }
 
-.orsep {
-  font-weight: bold;
-  font-variant: small-caps; 
-}
-
 .disabled {
   color: #cccccc;
 }
