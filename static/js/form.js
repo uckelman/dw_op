@@ -43,7 +43,9 @@ function setDisabled(value, ins) {
 
 function updateDisabled(value, others, group) {
   setDisabled(value, others);
-  setDisabled(!value, group);
+  if (!value) {
+    setDisabled(false, group);
+  }
 }
 
 persona.addEventListener("input", function(event) {
