@@ -307,6 +307,8 @@ def search_modern(c, surname, forename):
         query += 'forename LIKE ?'
         params = ('%{}%'.format(forename),)
 
+    query += ' ORDER BY surname, forename'
+
     matches = do_query(c, query, *params)
 
     if len(matches) == 1:
@@ -320,7 +322,7 @@ def search_modern(c, surname, forename):
 
 
 def search_persona(c, persona):
-    matches = do_query(c, 'SELECT id, name FROM personae WHERE name LIKE ?', '%{}%'.format(persona))
+    matches = do_query(c, 'SELECT id, name FROM personae WHERE name LIKE ? ORDER BY name', '%{}%'.format(persona))
 
     if len(matches) == 1:
         return redirect(url_for('persona', name=matches[0][1]))
