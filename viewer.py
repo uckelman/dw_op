@@ -229,7 +229,7 @@ def op():
         headers = {
             1000: 'Duchy',
              900: 'County',
-             800: 'Vicounty',
+             800: 'Viscounty',
              700: 'Bestowed peerages',
              600: 'Court Barony',
              500: 'Grant of Arms awards',
