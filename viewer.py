@@ -91,11 +91,11 @@ def persona(name):
 
     person_id, has_modname, region, blazon, emblazon = do_query(c, 'SELECT people.id, people.surname IS NOT NULL OR people.forename IS NOT NULL, regions.name, people.blazon, people.emblazon FROM personae JOIN people ON personae.person_id = people.id JOIN regions ON people.region_id = regions.id WHERE personae.name = ?', name)[0]
 
-    cur_id, curname, _ = do_query(c, 'SELECT personae.id, personae.name, MAX(awards.date) FROM awards JOIN personae ON awards.persona_id = personae.id JOIN people ON people.id = personae.person_id WHERE people.id = ?', person_id)[0];
+    official_id, official_name = do_query(c, 'SELECT id, name FROM personae WHERE person_id = ? AND official = 1', person_id)[0];
 
-    former = do_query(c, 'SELECT name FROM personae WHERE person_id = ? AND id != ? ORDER BY name', person_id, cur_id);
-    if former:
-        former = [f[0] for f in former]
+    other = do_query(c, 'SELECT name FROM personae WHERE person_id = ? AND id != ? ORDER BY name', person_id, official_id);
+    if other:
+        other = [f[0] for f in other]
 
     if emblazon:
         emblazon = '<img class="emblazon" src="{}"/>'.format(url_for('static', filename='images/arms/' + emblazon))
@@ -106,8 +106,8 @@ def persona(name):
 
     return render_template(
         'persona.html',
-        name=curname,
-        former=former,
+        name=official_name,
+        other=other,
         region=region,
         has_modname=has_modname,
         blazon=blazon,
@@ -216,6 +216,8 @@ def crown():
     )
 
 
+# FIXME: simplify query?
+
 @app.route('/op', methods=['GET', 'POST'])
 def op():
     headers = None
@@ -224,7 +226,7 @@ def op():
     if request.method == 'POST':
         min_precedence = int(request.form['precedence'].strip())
         c = get_db().cursor()
-        results = do_query(c, 'SELECT DISTINCT cur.name, awards.date, award_types.precedence FROM awards JOIN personae ON awards.persona_id = personae.id JOIN award_types ON awards.type_id = award_types.id LEFT JOIN (SELECT personae.person_id, awards.date, award_types.precedence FROM awards JOIN personae ON awards.persona_id = personae.id JOIN award_types ON awards.type_id = award_types.id) AS pjoin ON personae.person_id = pjoin.person_id AND award_types.precedence < pjoin.precedence LEFT JOIN (SELECT personae.person_id, awards.date, award_types.precedence FROM awards JOIN personae ON awards.persona_id = personae.id JOIN award_types ON awards.type_id = award_types.id) AS djoin ON personae.person_id = djoin.person_id AND award_types.precedence = djoin.precedence AND awards.date > djoin.date JOIN (SELECT DISTINCT personae.name, personae.person_id FROM awards JOIN personae ON awards.persona_id = personae.id LEFT JOIN (SELECT personae.person_id, awards.persona_id, awards.date FROM awards JOIN personae ON awards.persona_id = personae.id) AS sjoin ON personae.person_id = sjoin.person_id AND awards.date < sjoin.date WHERE sjoin.date IS NULL) AS cur ON cur.person_id = personae.person_id WHERE pjoin.precedence IS NULL AND djoin.date IS NULL AND award_types.precedence >= ? ORDER BY award_types.precedence DESC, awards.date, cur.name', min_precedence)
+        results = do_query(c, 'SELECT DISTINCT cur.name, awards.date, award_types.precedence FROM awards JOIN personae ON awards.persona_id = personae.id JOIN award_types ON awards.type_id = award_types.id LEFT JOIN (SELECT personae.person_id, award_types.precedence FROM awards JOIN personae ON awards.persona_id = personae.id JOIN award_types ON awards.type_id = award_types.id) AS pjoin ON personae.person_id = pjoin.person_id AND award_types.precedence < pjoin.precedence LEFT JOIN (SELECT personae.person_id, awards.date, award_types.precedence FROM awards JOIN personae ON awards.persona_id = personae.id JOIN award_types ON awards.type_id = award_types.id) AS djoin ON personae.person_id = djoin.person_id AND award_types.precedence = djoin.precedence AND awards.date > djoin.date JOIN personae AS cur ON personae.person_id = cur.person_id WHERE pjoin.precedence IS NULL AND djoin.date IS NULL AND award_types.precedence >= ? AND cur.official = 1 ORDER BY award_types.precedence DESC, awards.date, cur.name', min_precedence)
 
         headers = {
             1000: 'Duchy',
@@ -261,12 +263,11 @@ def reigns():
 
 
 # TODO: make an alphabetic index
-# FIXME: returning field not in the GROUP BY?
 
 @app.route('/armorial', methods=['GET'])
 def armorial():
     c = get_db().cursor()
-    results = do_query(c, 'SELECT p2.name, people.emblazon FROM people JOIN personae AS p1 ON p1.person_id = people.id JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id WHERE people.emblazon IS NOT NULL GROUP BY p2.person_id HAVING awards.date = MAX(awards.date) ORDER BY p2.name')
+    results = do_query(c, 'SELECT personae.name, people.emblazon FROM people JOIN personae ON personae.person_id = people.id WHERE people.emblazon IS NOT NULL AND personae.official = 1 ORDER BY personae.name')
 
     return render_template(
         'armorial.html',
