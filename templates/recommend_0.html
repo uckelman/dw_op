@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Award Recommendation{% endblock %}
+{% block content %}
+<div id="content">
+  <h1>Recommend Someone for an Award</h1>
+
+  <form method="post">
+    <input type="hidden" name="state" value="0"/> 
+    <input name="persona_search" type="text"/>
+    <button id="submit" type="submit" value="Search">Search</button>
+    <button id="reset" type="reset" value="Reset">Reset</button>
+  </form>
+
+</div>
+{% endblock %}

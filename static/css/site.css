@@ -87,6 +87,14 @@ th {
   text-align: left;
 }
 
+.awardslist_box {
+  column-count: 3;
+}
+
+.awardslist_box div {
+  display: inline-block;
+}
+
 .emblazon {
   float: left;
   margin: 0 2em 1em 0;

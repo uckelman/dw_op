@@ -381,5 +381,77 @@ def search():
     )
 
 
+@app.route('/recommend', methods=['GET', 'POST'])
+def recommend():
+
+    data = {}
+    state = 0
+
+    if request.method == 'POST':
+        state = request.form.get('state', default=0, type=int)
+
+        if state == 0:
+            persona_search = stripped(request.form, 'persona_search')
+
+            c = get_db().cursor()
+            data['matches'] = do_query(c, 'SELECT id, name FROM personae WHERE name LIKE ? ORDER BY name', '%{}%'.format(persona_search))
+
+            state = 1
+
+        elif state == 1:
+            data['persona_id'] = persona_id = request.form.get('persona', type=int)
+            c = get_db().cursor()
+            data['persona'] = do_query(c, 'SELECT name FROM personae WHERE id =  ?', persona_id)[0][0]
+
+            data['awards'] = do_query(c, 'SELECT award_types.name, awards.date FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id WHERE p1.id = ? ORDER BY awards.date, award_types.name', persona_id)
+
+            data['unawards'] = do_query(c, 'SELECT award_types.id, award_types.name, CASE award_types.group_id WHEN 1 THEN 2 ELSE award_types.group_id END AS group_id FROM award_types LEFT JOIN (SELECT award_types.id FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id WHERE p1.id = ?) AS a ON award_types.id = a.id WHERE award_types.group_id IN (1, 2, 3, 4, 5, 25, 27, 30) AND (award_types.open = 1 OR award_types.open IS NULL) AND award_types.id NOT IN (16, 27, 28, 29, 30, 49) AND a.id IS NULL ORDER BY group_id, award_types.precedence, award_types.name' , persona_id)
+
+            data['unawards'] = { g: list(gi) for g, gi in
+                itertools.groupby(data['unawards'], lambda x: x[2])
+            }
+
+#            data['sendto'] = [r[0] for r in do_query(c, 'SELECT name FROM groups WHERE id IN (2, 3, 4, 5, 25, 27, 30)')]
+            data['sendto'] = {
+                2: 'Drachenwald',
+                27: 'Insulae Draconis',
+                3: 'Nordmark',
+                4: 'Aarnimetsä',
+                30: 'Gotvik',
+                5: 'Knight\'s Crossing',
+                25: 'Styringheim'
+            }
+
+            state = 2
+
+        elif state == 2:
+
+            your_forename = stripped(request.form, 'your_forename')
+            your_surname = stripped(request.form, 'your_surname')
+            your_persona = stripped(request.form, 'your_persona')
+            your_email = stripped(request.form, 'your_email')
+
+            awards = request.form.getlist('awards[]')
+            crowns = request.form.getlist('crowns[]')
+            recommendation = stripped(request.form, 'recommendation')
+
+            data = {
+                'your_forename': your_forename,
+                'your_surname': your_surname,
+                'your_persona': your_persona,
+                'your_email': your_email,
+                'awards': awards,
+                'crowns': crowns,
+                'recommendation': recommendation
+            }
+
+            state = 3
+
+    return render_template(
+        'recommend_{}.html'.format(state),
+        data=data
+    )
+
+
 if __name__ == '__main__':
     app.run()

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Award Recommendation{% endblock %}
+{% block content %}
+<div id="content">
+  <h1>Recommend Someone for an Award</h1>
+
+  <form method="post">
+    <input type="hidden" name="state" value="1"/> 
+    {% if 'matches' in data %}
+    <table>
+      {% for i in data['matches'] %}
+      <tr>
+        <td><input name="persona" type="radio" value="{{i[0]}}"/><label for="persona">{{i[1]}}</label></td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% endif %}
+
+    <button id="submit" type="submit" value="Select">Select</button>
+  </form>
+
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Award Recommendation{% endblock %}
+{% block content %}
+<div id="content">
+  <h1>You have submitted</h1>
+
+  <table>
+    <tr>
+      <th>Your forename</th>
+      <td>{{data['your_forename']}}</td>
+    </tr>
+    <tr>
+      <th>Your surname</th>
+      <td>{{data['your_surname']}}</td>
+    </tr>
+    <tr>
+      <th>Your persona</th>
+      <td>{{data['your_persona']}}</td>
+    </tr>
+    <tr>
+      <th>Your email</th>
+      <td>{{data['your_email']}}</td>
+    </tr>
+    <tr>
+      <th>Awards</th>
+      <td>{{data['awards']}}</td>
+    </tr>
+    <tr>
+      <th>Crowns</th>
+      <td>{{data['crowns']}}</td>
+    </tr>
+    <tr>
+      <th>Recommendation</th>
+      <td>{{data['recommendation']}}</td>
+    </tr>
+  </table>
+
+</div>
+
+{% endblock %}

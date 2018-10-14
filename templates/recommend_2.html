@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block title %}Award Recommendation{% endblock %}
+{% block content %}
+<div id="content">
+  <h1>Recommend Someone for an Award</h1>
+
+  <form method="post">
+    <input type="hidden" name="state" value="2"/>
+    <input type="hidden" name="persona_id" value="{{data['persona_id']}}"/>
+    <input type="hidden" name="persona" value="{{data['persona']}}"/>
+
+    <h2>You</h2>
+    <table>
+      <tr>
+        <th><label for="your_forename">First</label></th>
+        <td><input name="your_forename" type="text" required/></td>
+        <th><label for="your_surname">Last</label></th>
+        <td><input name="your_surname" type="text" required/></td>
+      </tr>
+      <tr>
+        <th><label for="your_persona">Persona</label></th>
+        <td><input name="your_persona" type="text" required/></td>
+      </tr>
+      <tr>
+        <th><label for="your_email">Email</label></th>
+        <td><input name="your_email" type="email" required/></td>
+      </tr>
+    </table>
+
+    <h2>recommend</h2>
+
+    <table>
+      <tr>
+        <td>{{data['persona']}}</td>
+      </tr>
+      <tr>
+        <td>posessed already of these awards</td>
+      </tr>
+      <tr>
+        <td>
+          <table>
+            {% for i in data['awards'] %}
+            <tr>
+              <td>{{i[0]}}</td>
+              <td>{{i[1]}}</td>
+            </tr>
+            {% endfor %}
+          </table>
+        </td>
+      <tr>
+    </table>
+
+    <h2>for the following awards</h2>
+    <div class="awardslist_box">
+    {% for g, gi in data['unawards'].items() %}
+      <div>
+        <h3>{{data['sendto'][g]}}</h3>
+        <table>
+        {% for i in gi %}
+          <tr>
+            <td><input id="award_{{i[0]}}" name="awards[]" value="{{i[0]}}" type="checkbox"/></td>
+            <th><label for ="award_{{i[0]}}">{{i[1]}}</label></th>
+          </tr>
+        {% endfor %}
+        </table>
+      </div>
+    {% endfor %}
+    </div>
+
+    <h2>because</h2>
+    <textarea id="recommendation" name="recommendation" rows="10" cols="80" placeholder="Oooooeeee, what's 'e done this time?" required></textarea>
+
+    <h2>to crowns of</h2>
+    <table>
+      {% for k, v in data['sendto'].items() %}
+      <tr>
+        <td><input id="crown_{{k}}" name="crowns[]" value="{{k}}" type="checkbox"/></td>
+        <th><label for ="crown_{{k}}">{{v}}</label></th>
+      </tr>
+      {% endfor %}
+    </table>
+
+    <button id="submit" type="submit" value="Submit">Submit</button>
+    <button id="reset" type="reset" value="Reset">Reset</button>
+  </form>
+</div>
+
+<script src="{{ url_for('static', filename='js/rec.js') }}" type="application/javascript"></script>
+
+<script type="text/javascript">
+var a = [
+{%- for g, gi in data['unawards'].items() %}
+  {% for i in gi %}
+  [
+    document.getElementById('award_{{i[0]}}'),
+    document.getElementById('crown_{{i[2]}}')
+  ],
+  {% endfor %}
+{% endfor -%}
+];
+
+var c2a = {};
+for (let x of a) {
+  if (!(x[1].id in c2a)) {
+    c2a[x[1].id] = [];
+  }
+  c2a[x[1].id].push(x[0]);
+
+  x[0].addEventListener("change", function(event) {
+    if (x[0].checked) {
+      x[1].checked = x[1].disabled = true;
+    }
+    else {
+      x[1].disabled = c2a[x[1].id].reduce((v, y) => v || y.checked, false);
+    }
+  });
+}
+
+var c = [...new Set(a.map(x => x[1]))];
+
+c.forEach(x => x.addEventListener("change", function(event) {
+  if (x.checked) {
+    c.forEach(y => y.setCustomValidity(""));
+  } 
+}));
+
+var submit = document.getElementById("submit");
+
+submit.addEventListener("click", function(event) {
+  var some_crown_is_checked = c.some(x => x.checked);
+  if (!some_crown_is_checked) {
+    c.forEach(x => x.setCustomValidity("Must check at least one crown!"));
+  }
+});
+
+var form = document.getElementsByTagName('form')[0];
+
+form.addEventListener("reset", function(event) {
+  c.forEach(x => x.disabled = false);
+  c.forEach(x => x.setCustomValidity(""));
+}, false);
+
+form.addEventListener("submit", function(event) {
+  c.forEach(x => x.disabled = false);
+}, false);
+</script>
+
+{% endblock %}
