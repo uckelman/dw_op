@@ -23,6 +23,17 @@
       </tbody>
     </table>
   </div>
+
+  <script>
+    for (let t of document.getElementsByClassName('results')) {
+      new Tablesort(t);
+    }
+  </script>
+{%- endmacro %}
+
+{% macro tablesort_head() -%}
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/tablesort.css') }}"/>
+  <script src="{{ url_for('static', filename='js/tablesort.min.js') }}"></script>
 {%- endmacro %}
 
 {% macro navlist() -%}
