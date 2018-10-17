@@ -5,9 +5,9 @@
   {% if matches %}
   <h1>Several names match your query</h1>
   <table>
-    {% for i in matches %}
+    {% for g in matches %}
     <tr>
-      <td><a href="{{ url_for('persona', name=i[1]) }}">{{i[1]}}</a></td>
+      <td><a href="{{ url_for('persona', name=g[0]) }}">{{g[0]}}</a>{% if g[1:] %} (also known as {{ g[1:]|join(', ') }}){% endif %}</td>
     </tr>
     {% endfor %}
   </table>

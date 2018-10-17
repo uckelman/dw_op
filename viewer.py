@@ -326,11 +326,17 @@ def search_modern(c, surname, forename):
         return render_template('choose_person.html', matches=matches)
 
 
+def match_persona(c, name):
+    rows = do_query(c, 'SELECT p2.id, p2.name, p1.person_id, p2.official FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id  WHERE p1.name LIKE ? AND p1.official = 1 ORDER BY p1.person_id, p2.official DESC, p2.name', '%{}%'.format(name))
+
+    return [[i[1] for i in gi] for _, gi in itertools.groupby(rows, lambda r: r[2])]
+
+
 def search_persona(c, persona):
-    matches = do_query(c, 'SELECT id, name FROM personae WHERE name LIKE ? ORDER BY name', '%{}%'.format(persona))
+    matches = match_persona(c, persona)
 
     if len(matches) == 1:
-        return redirect(url_for('persona', name=matches[0][1]))
+        return redirect(url_for('persona', name=matches[0][0]))
     else:
         return render_template('choose_persona.html', matches=matches)
 
@@ -398,7 +404,10 @@ def recommend():
             persona_search = stripped(request.form, 'persona_search')
 
             c = get_db().cursor()
-            data['matches'] = do_query(c, 'SELECT id, name FROM personae WHERE name LIKE ? ORDER BY name', '%{}%'.format(persona_search))
+
+            rows = do_query(c, 'SELECT p2.id, p2.name, p1.person_id, p2.official FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id  WHERE p1.name LIKE ? AND p1.official = 1 ORDER BY p1.person_id, p2.official DESC, p2.name', '%{}%'.format(persona_search))
+
+            data['matches'] = [[(i[0], i[1]) for i in gi] for _, gi in itertools.groupby(rows, lambda r: r[2])]
 
             state = 1
 

@@ -8,9 +8,9 @@
     <input type="hidden" name="state" value="1"/> 
     {% if 'matches' in data %}
     <table>
-      {% for i in data['matches'] %}
+      {% for g in data['matches'] %}
       <tr>
-        <td><input name="persona" type="radio" value="{{i[0]}}"/><label for="persona">{{i[1]}}</label></td>
+        <td><input name="persona" type="radio" value="{{g[0][0]}}"/><label for="persona">{{g[0][1]}}{%if g[1:] %} (also known as {{ g[1:]|join(', ', attribute=1) }}){% endif %}</label></td>
       </tr>
       {% endfor %}
       <tr>
