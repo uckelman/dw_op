@@ -29,26 +29,19 @@
 
     <h2>recommend</h2>
 
+    {{data['persona']}}
+
+    {% if data['awards'] %}
+    posessed already of these awards
     <table>
+      {% for i in data['awards'] %}
       <tr>
-        <td>{{data['persona']}}</td>
+        <td>{{i[0]}}</td>
+        <td>{{i[1]}}</td>
       </tr>
-      <tr>
-        <td>posessed already of these awards</td>
-      </tr>
-      <tr>
-        <td>
-          <table>
-            {% for i in data['awards'] %}
-            <tr>
-              <td>{{i[0]}}</td>
-              <td>{{i[1]}}</td>
-            </tr>
-            {% endfor %}
-          </table>
-        </td>
-      <tr>
+      {% endfor %}
     </table>
+    {% endif %}
 
     <h2>for the following awards</h2>
     <div class="awardslist_box">

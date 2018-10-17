@@ -3,9 +3,11 @@
 import itertools
 import os
 import sqlite3
+import textwrap
 import traceback
 
 from flask import Flask, flash, g, redirect, render_template, request, url_for
+from flask_mail import Mail, Message
 
 from auth import User, handle_login, handle_logout, login_required
 
@@ -21,6 +23,8 @@ app = Flask(__name__)
 app.config.update(default_config())
 app.config.from_pyfile('config.py')
 app.config['USERS'] = { x[0]: User(*x) for x in app.config['USERS'] }
+
+mail = Mail(app)
 
 
 def connect_db():
@@ -399,11 +403,15 @@ def recommend():
             state = 1
 
         elif state == 1:
-            data['persona_id'] = persona_id = request.form.get('persona', type=int)
             c = get_db().cursor()
-            data['persona'] = do_query(c, 'SELECT name FROM personae WHERE id =  ?', persona_id)[0][0]
 
-            data['awards'] = do_query(c, 'SELECT award_types.name, awards.date FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id WHERE p1.id = ? ORDER BY awards.date, award_types.name', persona_id)
+            data['persona_id'] = persona_id = request.form.get('persona', type=int)
+            if persona_id is None:
+                data['persona'] = stripped(request.form, 'unknown')
+                data['awards'] = []
+            else:
+                data['persona'] = do_query(c, 'SELECT name FROM personae WHERE id =  ?', persona_id)[0][0]
+                data['awards'] = do_query(c, 'SELECT award_types.name, awards.date FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id WHERE p1.id = ? ORDER BY awards.date, award_types.name', persona_id)
 
             data['unawards'] = do_query(c, 'SELECT award_types.id, award_types.name, CASE award_types.group_id WHEN 1 THEN 2 ELSE award_types.group_id END AS group_id FROM award_types LEFT JOIN (SELECT award_types.id FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id WHERE p1.id = ?) AS a ON award_types.id = a.id WHERE award_types.group_id IN (1, 2, 3, 4, 5, 25, 27, 30) AND (award_types.open = 1 OR award_types.open IS NULL) AND award_types.id NOT IN (16, 27, 28, 29, 30, 49) AND a.id IS NULL ORDER BY group_id, award_types.precedence, award_types.name' , persona_id)
 
@@ -431,21 +439,71 @@ def recommend():
             your_persona = stripped(request.form, 'your_persona')
             your_email = stripped(request.form, 'your_email')
 
-            awards = request.form.getlist('awards[]')
-            crowns = request.form.getlist('crowns[]')
+            persona = stripped(request.form, 'persona')
+            persona_id = request.form.get('persona_id', type=int)
+            awards = request.form.getlist('awards[]', type=int)
+            crowns = request.form.getlist('crowns[]', type=int)
             recommendation = stripped(request.form, 'recommendation')
+
+            c = get_db().cursor()
+            crown_names = [n[0] for n in do_query(c, 'SELECT name FROM groups WHERE id IN ({})'.format(','.join(['?'] * len(crowns))), *crowns)]
+            award_names = [n[0] for n in do_query(c, 'SELECT name FROM award_types WHERE id IN ({})'.format(','.join(['?'] * len(awards))), *awards)]
 
             data = {
                 'your_forename': your_forename,
                 'your_surname': your_surname,
                 'your_persona': your_persona,
                 'your_email': your_email,
+                'persona': persona,
+                'persona_id': persona_id,
                 'awards': awards,
+                'award_names': award_names,
                 'crowns': crowns,
+                'crown_names': crown_names,
                 'recommendation': recommendation
             }
 
             state = 3
+
+        elif state == 3:
+            your_email = stripped(request.form, 'your_email')
+
+            body_vars = {
+                'your_forename': stripped(request.form, 'your_forename'),
+                'your_surname': stripped(request.form, 'your_surname'),
+                'your_persona': stripped(request.form, 'your_persona'),
+                'your_email': your_email,
+                'persona': stripped(request.form, 'persona'),
+                'award_names': ', '.join(request.form.getlist('award_names[]')),
+                'recommendation': stripped(request.form, 'recommendation')
+            }
+
+            body = '''
+{your_forename} {your_surname}
+{your_persona}
+{your_email}
+
+Recommendation of {persona}
+For the following awards: {award_names}
+
+{recommendation}
+'''.format(**body_vars)
+
+            body = '\n'.join(itertools.chain.from_iterable(textwrap.wrap(para, width=72) or [''] for para in body.split('\n'))).strip()
+
+#            crowns = request.form.getlist('crowns[]', type=int)
+
+            msg = Message(
+                'Recommendation',
+                sender='noreply@op.drachenwald.sca.org',
+                recipients=['uckelman@nomic.net'],
+                cc=[your_email],
+                body=body
+            )
+
+            mail.send(msg)
+
+            state = 4
 
     return render_template(
         'recommend_{}.html'.format(state),

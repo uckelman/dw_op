@@ -6,12 +6,8 @@
 
   <table>
     <tr>
-      <th>Your forename</th>
-      <td>{{data['your_forename']}}</td>
-    </tr>
-    <tr>
-      <th>Your surname</th>
-      <td>{{data['your_surname']}}</td>
+      <th>Your name</th>
+      <td>{{data['your_forename']}} {{data['your_surname']}}</td>
     </tr>
     <tr>
       <th>Your persona</th>
@@ -22,12 +18,16 @@
       <td>{{data['your_email']}}</td>
     </tr>
     <tr>
+      <th>Persona</th>
+      <td>{{data['persona']}}</td>
+    </tr>
+    <tr>
       <th>Awards</th>
-      <td>{{data['awards']}}</td>
+      <td>{{ ', '.join(data['award_names']) }}</td>
     </tr>
     <tr>
       <th>Crowns</th>
-      <td>{{data['crowns']}}</td>
+      <td>{{ ', '.join(data['crown_names']) }}</td>
     </tr>
     <tr>
       <th>Recommendation</th>
@@ -35,7 +35,24 @@
     </tr>
   </table>
 
-  <h1>to the test form and it has been discarded.</h1>
+  <form method="post">
+    <input type="hidden" name="state" value="3"/>
+    <input type="hidden" name="your_forename" value="{{data['your_forename']}}"/>
+    <input type="hidden" name="your_surname" value="{{data['your_surname']}}"/>
+    <input type="hidden" name="your_persona" value="{{data['your_persona']}}"/>
+    <input type="hidden" name="your_email" value="{{data['your_email']}}"/>
+    <input type="hidden" name="persona" value="{{data['persona']}}"/>
+    <input type="hidden" name="persona_id" value="{{data['persona_id']}}"/>
+    {% for i in data['crowns'] %}
+    <input type="hidden" name="crowns[]" value="{{i}}"/>
+    {% endfor %}
+    {% for i in data['award_names'] %}
+    <input type="hidden" name="award_names[]" value="{{i}}"/>
+    {% endfor %}
+    <input type="hidden" name="recommendation" value="{{data['recommendation']}}"/>
+    <button id="submit" type="submit" value="Submit">Submit</button>
+  </form>
+  
 </div>
 
 {% endblock %}
