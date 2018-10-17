@@ -117,7 +117,7 @@ for (let x of a) {
       x[1].checked = x[1].disabled = true;
     }
     else {
-      x[1].disabled = c2a[x[1].id].reduce((v, y) => v || y.checked, false);
+      x[1].checked = x[1].disabled = c2a[x[1].id].reduce((v, y) => v || y.checked, false);
     }
   });
 }
