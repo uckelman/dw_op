@@ -4,32 +4,12 @@
 <div id="content">
   <h1>Recommend Someone for an Award</h1>
 
-  <form method="post">
+  <form id="recform" method="post">
     <input type="hidden" name="state" value="2"/>
     <input type="hidden" name="persona_id" value="{{data['persona_id']}}"/>
     <input type="hidden" name="persona" value="{{data['persona']}}"/>
 
-    <h2>You</h2>
-    <table>
-      <tr>
-        <th><label for="your_forename">First</label></th>
-        <td><input name="your_forename" type="text" required/></td>
-        <th><label for="your_surname">Last</label></th>
-        <td><input name="your_surname" type="text" required/></td>
-      </tr>
-      <tr>
-        <th><label for="your_persona">Persona</label></th>
-        <td><input name="your_persona" type="text" required/></td>
-      </tr>
-      <tr>
-        <th><label for="your_email">Email</label></th>
-        <td><input name="your_email" type="email" required/></td>
-      </tr>
-    </table>
-
-    <h2>recommend</h2>
-
-    {{data['persona']}}
+    <h2>{{data['persona']}}</h2>
 
     {% if data['awards'] %}
     posessed already of these awards
@@ -43,7 +23,7 @@
     </table>
     {% endif %}
 
-    <h2>for the following awards</h2>
+    <h2>For which awards do you recommend this person?</h2>
     <div class="awardslist_box">
     {% for g, gi in data['unawards'].items() %}
       <div>
@@ -60,10 +40,10 @@
     {% endfor %}
     </div>
 
-    <h2>because</h2>
+    <h2>Why?</h2>
     <textarea id="recommendation" name="recommendation" rows="10" cols="80" placeholder="Oooooeeee, what's 'e done this time?" required></textarea>
 
-    <h2>to crowns of</h2>
+    <h2>Which Crowns should receive your recommendation?</h2>
     <table>
       {% for k, v in data['sendto'].items() %}
       <tr>
@@ -71,6 +51,39 @@
         <th><label for ="crown_{{k}}">{{v}}</label></th>
       </tr>
       {% endfor %}
+    </table>
+
+    <h2>Which events might the recommendee attend?</h2>
+    <textarea id="events" name="events" rows="4" cols="80" placeholder="E.g., Michaelmas, Twelfth Night"></textarea>
+
+    <h2>Who, if anyone, do you suggest as a scribe?</h2>
+    <table>
+      <tr>
+        <th><label for="scribe">Name</label></th>
+        <td><input id="scribe" name="scribe" type="text"/></td>
+      </tr>
+      <tr>
+        <th><label for="scribe_email">Email</label></th>
+        <td><input id="scribe_email" name="scribe_email" type="email"/></td>
+      </tr>
+    </table>
+
+    <h2>Who are you?</h2>
+    <table>
+      <tr>
+        <th><label for="your_forename">First</label></th>
+        <td><input name="your_forename" type="text" required/></td>
+        <th><label for="your_surname">Last</label></th>
+        <td><input name="your_surname" type="text" required/></td>
+      </tr>
+      <tr>
+        <th><label for="your_persona">Persona</label></th>
+        <td><input name="your_persona" type="text" required/></td>
+      </tr>
+      <tr>
+        <th><label for="your_email">Email</label></th>
+        <td><input name="your_email" type="email" required/></td>
+      </tr>
     </table>
 
     <button id="submit" type="submit" value="Submit">Submit</button>

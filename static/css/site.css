@@ -215,6 +215,10 @@ table.searchform td {
   padding: 0.25em;
 }
 
+#recform h2 {
+  margin: 0.5em 0 0.25em 0;
+}
+
 #foot_nav, #head_nav {
   font-variant: small-caps;
   text-align: center;
