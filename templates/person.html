@@ -1,4 +1,8 @@
 {% extends "base.html" %}
+{% block head %}
+  {{ super() }}
+  {{ macros.tablesort_head() }}
+{% endblock %}
 {% block title %}Drachenwald OP - {{forename}} {{surname}}{% endblock %}
 {% block content %}
 <div id="content">
@@ -11,7 +15,7 @@
       <thead>
         <tr>
           <th>Award</th>
-          <th>Date</th>
+          <th data-sort-default>Date</th>
           <th>Crown</th>
           <th>Event</th>
         </tr>
@@ -30,4 +34,10 @@
     {% endif %}
   </div>
 </div>
+
+<script>
+  for (let t of document.getElementsByClassName('results')) {
+    new Tablesort(t);
+  }
+</script>
 {% endblock %}

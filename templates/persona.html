@@ -1,4 +1,8 @@
 {% extends "base.html" %}
+{% block head %}
+  {{ super() }}
+  {{ macros.tablesort_head() }}
+{% endblock %}
 {% block title %}Drachenwald OP - {{name}}{% endblock %}
 {% block content %}
 <div id="content">
@@ -19,8 +23,36 @@
     bearing arms of {{blazon}}
     {% endif %}
   </div>
-  {% call(name) macros.awardlist(awards) -%}
-    {{name}}
-  {%- endcall %}
+
+  <div id="awards">
+    <table class="results">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Award</th>
+          <th data-sort-default>Date</th>
+          <th>Crown</th>
+          <th>Event</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for i in awards -%}
+        <tr>
+          <td>{{i[0]}}</td>
+          <td>{{i[1]}}</td>
+          <td>{{i[2]}}</td>
+          <td>{{i[3]}}</td>
+          <td>{{i[4]}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    for (let t of document.getElementsByClassName('results')) {
+      new Tablesort(t);
+    }
+  </script>
 </div>
 {% endblock %}

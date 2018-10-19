@@ -1,28 +1,6 @@
-{% macro awardlist(results) -%}
-  <div id="awards">
-    <table class="results">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Award</th>
-          <th>Date</th>
-          <th>Crown</th>
-          <th>Event</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for i in results -%}
-        <tr>
-          <td>{{ caller(i[0]) }}</td>
-          <td>{{i[1]}}</td>
-          <td>{{i[2]}}</td>
-          <td>{{i[3]}}</td>
-          <td>{{i[4]}}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+{% macro tablesort_head() -%}
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/tablesort.css') }}"/>
+  <script src="{{ url_for('static', filename='js/tablesort.min.js') }}"></script>
 {%- endmacro %}
 
 {% macro navlist() -%}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Award Recommendation{% endblock %}
+{% block content %}
+<div id="content">
+  <h1>Recommend Someone for an Award</h1>
+
+  <form method="post">
+    <input type="hidden" name="state" value="1"/> 
+    {% if 'matches' in data %}
+    <table>
+      {% for g in data['matches'] %}
+      <tr>
+        <td><input name="persona" type="radio" value="{{g[0][0]}}"/><label for="persona">{{g[0][1]}}{%if g[1:] %} (also known as {{ g[1:]|join(', ', attribute=1) }}){% endif %}</label></td>
+      </tr>
+      {% endfor %}
+      <tr>
+        <td><input name="persona" type="radio" value=""/><input name="unknown" type="text"/></td>
+      </tr>
+    </table>
+    {% endif %}
+
+    <button id="submit" type="submit" value="Select">Select</button>
+  </form>
+
+</div>
+{% endblock %}

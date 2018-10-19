@@ -87,6 +87,14 @@ th {
   text-align: left;
 }
 
+.awardslist_box {
+  column-count: 3;
+}
+
+.awardslist_box div {
+  display: inline-block;
+}
+
 .emblazon {
   float: left;
   margin: 0 2em 1em 0;
@@ -205,6 +213,10 @@ table.searchform td {
   border-radius: 5px;
   background-color: #ffaaaa;
   padding: 0.25em;
+}
+
+#recform h2 {
+  margin: 0.5em 0 0.25em 0;
 }
 
 #foot_nav, #head_nav {
