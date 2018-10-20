@@ -414,7 +414,7 @@ def recommend():
             results = [[(i[0], i[1]) for i in gi] for _, gi in itertools.groupby(rows, lambda r: r[2])]
             results.sort(key=lambda x: (x[0][1].casefold(), x[0][1]))
 
-            data['matches'] = resul
+            data['matches'] = results
             state = 1
 
         elif state == 1:
