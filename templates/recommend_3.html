@@ -31,7 +31,7 @@
     </tr>
     <tr>
       <th>Recommendation</th>
-      <td>{{data['recommendation']}}</td>
+      <td><p>{{ data['recommendation_display']|e|regex_replace('\\n{2,}', '</p><p>')|safe }}</p></td>
     </tr>
     {% if data['scribe'] or data['scribe_email'] %}
     <tr>
