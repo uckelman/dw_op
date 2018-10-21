@@ -21,6 +21,24 @@
       <th>Persona</th>
       <td>{{data['persona']}}</td>
     </tr>
+    {% if data['time_served'] %}
+    <tr>
+      <th>Time in the Society</th>
+      <td>{{data['time_served']}}</td>
+    </tr>
+    {% endif %}
+    {% if data['gender'] %}
+    <tr>
+      <th>Gender</th>
+      <td>{{data['gender']}}</td>
+    </tr>
+    {% endif %}
+    {% if data['branch'] %}
+    <tr>
+      <th>Branch</th>
+      <td>{{data['branch']}}</td>
+    </tr>
+    {% endif %}
     <tr>
       <th>Awards</th>
       <td>{{ ', '.join(data['award_names']) }}</td>
@@ -49,6 +67,15 @@
     <input type="hidden" name="your_email" value="{{data['your_email']}}"/>
     <input type="hidden" name="persona" value="{{data['persona']}}"/>
     <input type="hidden" name="persona_id" value="{{data['persona_id']}}"/>
+    {% if data['time_served'] %}
+    <input type="hidden" name="time_served" value="{{data['time_served']}}"/>
+    {% endif %}
+    {% if data['gender'] %}
+    <input type="hidden" name="gender" value="{{data['gender']}}"/>
+    {% endif %}
+    {% if data['branch'] %}
+    <input type="hidden" name="branch" value="{{data['branch']}}"/>
+    {% endif %}
     {% for i in data['crowns'] %}
     <input type="hidden" name="crowns[]" value="{{i}}"/>
     {% endfor %}

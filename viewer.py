@@ -436,6 +436,8 @@ def recommend():
                 data['persona'] = do_query(c, 'SELECT name FROM personae WHERE id =  ?', persona_id)[0][0]
                 data['awards'] = do_query(c, 'SELECT award_types.name, awards.date FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id WHERE p1.id = ? ORDER BY awards.date, award_types.name', persona_id)
 
+            data['in_op'] = persona_id is not None
+
             data['unawards'] = do_query(c, 'SELECT award_types.id, award_types.name, CASE award_types.group_id WHEN 1 THEN 2 ELSE award_types.group_id END AS group_id FROM award_types LEFT JOIN (SELECT award_types.id FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id WHERE p1.id = ?) AS a ON award_types.id = a.id WHERE award_types.group_id IN (1, 2, 3, 4, 5, 25, 27, 30) AND (award_types.open = 1 OR award_types.open IS NULL) AND award_types.id NOT IN (16, 27, 28, 29, 30, 49) AND a.id IS NULL ORDER BY group_id, award_types.precedence, award_types.name' , persona_id)
 
             data['unawards'] = { g: list(gi) for g, gi in
@@ -464,6 +466,11 @@ def recommend():
 
             persona = stripped(request.form, 'persona')
             persona_id = request.form.get('persona_id', type=int)
+
+            time_served = stripped(request.form, 'time_served')
+            gender = stripped(request.form, 'gender')
+            branch = stripped(request.form, 'branch')
+
             awards = request.form.getlist('awards[]', type=int)
             crowns = request.form.getlist('crowns[]', type=int)
             recommendation = stripped(request.form, 'recommendation')
@@ -482,6 +489,9 @@ def recommend():
                 'your_email': your_email,
                 'persona': persona,
                 'persona_id': persona_id,
+                'time_served': time_served,
+                'gender': gender,
+                'branch': branch,
                 'awards': awards,
                 'award_names': award_names,
                 'crowns': crowns,
@@ -502,6 +512,9 @@ def recommend():
                 'your_persona': stripped(request.form, 'your_persona'),
                 'your_email': your_email,
                 'persona': stripped(request.form, 'persona'),
+                'time_served': stripped(request.form, 'time_served'),
+                'gender': stripped(request.form, 'gender'),
+                'branch': stripped(request.form, 'branch'),
                 'award_names': ', '.join(request.form.getlist('award_names[]')),
                 'recommendation': stripped(request.form, 'recommendation'),
                 'scribe': stripped(request.form, 'scribe') or '',
@@ -514,6 +527,18 @@ def recommend():
 {your_email}
 
 Recommendation of {persona}
+'''
+
+            if body_vars['time_served']:
+                body_fmt += 'Time in the Society: {time_served}\n'
+
+            if body_vars['gender']:
+                body_fmt += 'Gender: {gender}\n'
+
+            if body_vars['branch']:
+                body_fmt += 'Branch: {branch}\n'
+
+            body_fmt += '''
 For the following awards: {award_names}
 
 {recommendation}

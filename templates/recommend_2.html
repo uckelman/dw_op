@@ -21,6 +21,38 @@
       </tr>
       {% endfor %}
     </table>
+    {% elif not data['in_op'] %}
+    <h2>This person is not already in the Order of Precedence.</h2>
+    <table>
+      <tr>
+        <th>
+          <label for="time_served">How long has this person been in the society?</label>
+        </th>
+        <td>
+          <input id="time_served" name="time_served" type="text"/>
+        </td>
+      </tr>
+      <tr>
+        <th>
+          <label for="gender">Gender</label>
+        </th>
+        <td>
+          <select id="gender" name="gender">
+            <option value="male">male</option>
+            <option value="female">female</option>
+            <option value="other">other</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <th>
+          <label for="branch">Home shire, group, or region</label>
+        </th>
+        <td>
+          <input id="branch" name="branch" type="text"/>
+        </td>
+      </tr>
+    </table>
     {% endif %}
 
     <h2>For which awards do you recommend this person?</h2>
