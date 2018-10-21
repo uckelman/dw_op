@@ -460,6 +460,9 @@ def recommend():
             crowns = request.form.getlist('crowns[]', type=int)
             recommendation = stripped(request.form, 'recommendation')
 
+            scribe = stripped(request.form, 'scribe')
+            scribe_email = stripped(request.form, 'scribe_email')
+
             c = get_db().cursor()
             crown_names = [n[0] for n in do_query(c, 'SELECT name FROM groups WHERE id IN ({})'.format(','.join(['?'] * len(crowns))), *crowns)]
             award_names = [n[0] for n in do_query(c, 'SELECT name FROM award_types WHERE id IN ({})'.format(','.join(['?'] * len(awards))), *awards)]
@@ -475,7 +478,9 @@ def recommend():
                 'award_names': award_names,
                 'crowns': crowns,
                 'crown_names': crown_names,
-                'recommendation': recommendation
+                'recommendation': recommendation,
+                'scribe': scribe,
+                'scribe_email': scribe_email
             }
 
             state = 3
@@ -490,10 +495,12 @@ def recommend():
                 'your_email': your_email,
                 'persona': stripped(request.form, 'persona'),
                 'award_names': ', '.join(request.form.getlist('award_names[]')),
-                'recommendation': stripped(request.form, 'recommendation')
+                'recommendation': stripped(request.form, 'recommendation'),
+                'scribe': stripped(request.form, 'scribe') or '',
+                'scribe_email': stripped(request.form, 'scribe_email') or ''
             }
 
-            body = '''
+            body_fmt = '''
 {your_forename} {your_surname}
 {your_persona}
 {your_email}
@@ -502,7 +509,12 @@ Recommendation of {persona}
 For the following awards: {award_names}
 
 {recommendation}
-'''.format(**body_vars)
+'''
+
+            if body_vars['scribe'] or body_vars['scribe_email']:
+                body_fmt += '\nSuggested scribe: {scribe} {scribe_email}'
+
+            body = body_fmt.format(**body_vars)
 
             body = '\n'.join(itertools.chain.from_iterable(textwrap.wrap(para, width=72) or [''] for para in body.split('\n'))).strip()
 

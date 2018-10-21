@@ -33,6 +33,12 @@
       <th>Recommendation</th>
       <td>{{data['recommendation']}}</td>
     </tr>
+    {% if data['scribe'] or data['scribe_email'] %}
+    <tr>
+      <th>Scribe</th>
+      <td>{{ data['scribe'] or '' }} {{ data['scribe_email'] or '' }}</td>
+    </tr>
+    {% endif %}
   </table>
 
   <form method="post">
@@ -50,6 +56,8 @@
     <input type="hidden" name="award_names[]" value="{{i}}"/>
     {% endfor %}
     <input type="hidden" name="recommendation" value="{{data['recommendation']}}"/>
+    <input type="hidden" name="scribe" value="{{data['scribe'] or ''}}"/>
+    <input type="hidden" name="scribe_email" value="{{data['scribe_email'] or ''}}"/>
     <button id="submit" type="submit" value="Submit">Submit</button>
   </form>
   
