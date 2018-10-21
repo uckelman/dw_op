@@ -396,9 +396,11 @@ def search():
     )
 
 
-@app.template_filter('regex_replace')
-def regex_replace(string, pattern, repl):
-    return re.sub(pattern, repl, string)
+@app.template_filter('paragraphize')
+def paragraphize(text):
+    text = '\n'.join(l.strip() for l in text.splitlines())
+    paras = re.split(r'\n{2,}', text)
+    return '\n\n'.join('<p>{}</p>'.format(p) for p in paras)
 
 
 @app.route('/recommend', methods=['GET', 'POST'])
@@ -466,8 +468,6 @@ def recommend():
             crowns = request.form.getlist('crowns[]', type=int)
             recommendation = stripped(request.form, 'recommendation')
 
-            recommendation_display = '\n'.join(l.strip() for l in recommendation.splitlines())
-
             scribe = stripped(request.form, 'scribe')
             scribe_email = stripped(request.form, 'scribe_email')
 
@@ -487,7 +487,6 @@ def recommend():
                 'crowns': crowns,
                 'crown_names': crown_names,
                 'recommendation': recommendation,
-                'recommendation_display': recommendation_display,
                 'scribe': scribe,
                 'scribe_email': scribe_email
             }
