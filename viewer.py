@@ -551,12 +551,24 @@ For the following awards: {award_names}
 
             body = '\n'.join(itertools.chain.from_iterable(textwrap.wrap(para, width=72) or [''] for para in body.split('\n'))).strip()
 
-#            crowns = request.form.getlist('crowns[]', type=int)
+            crowns = request.form.getlist('crowns[]', type=int)
+
+            crown_emails = {
+                 2: ['king@drachenwald.sca.org', 'queen@drachenwald.sca.org'],
+                27: ['prince@insulaedraconis.org', 'princess@insulaedraconis.org'],
+                 3: ['furste@nordmark.org', 'furstinna@nordmark.org'],
+                 4: ['paroni@aarnimetsa.org', 'paronitar@aarnimetsa.org'],
+                30: ['baron@gotvik.se', 'baroness@gotvik.se'],
+                 5: ['baron@knightscrossing.org', 'baronin@knightscrossing.org'],
+                25: ['baron@styringheim.se', 'baronessa@styringheim.se']
+            }
+
+            to = [a for c in crowns for a in crown_emails[c]]
 
             msg = Message(
                 'Recommendation',
                 sender='noreply@op.drachenwald.sca.org',
-                recipients=['uckelman@nomic.net'],
+                recipients=to,
                 cc=[your_email],
                 body=body
             )
