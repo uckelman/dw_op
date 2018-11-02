@@ -6,6 +6,7 @@ import re
 import sqlite3
 import textwrap
 import traceback
+import unicodedata
 
 from flask import Flask, flash, g, redirect, render_template, request, url_for
 from flask_mail import Mail, Message
@@ -327,8 +328,29 @@ def search_modern(c, surname, forename):
         return render_template('choose_person.html', matches=matches)
 
 
+trans = str.maketrans({
+    'Æ': 'Ae',
+    'æ': 'ae',
+    'Œ': 'Oe',
+    'œ': 'oe',
+    'đ': 'd',
+    'ø': 'o',
+    'Ø': 'O',
+    'þ': 'th',
+    'Þ': 'Th',
+    'ð': 'dh',
+    'ß': 'ss'
+})
+
+
+def normalize(s):
+    return ''.join(c for c in unicodedata.normalize('NFKD', s) if not unicodedata.combining(c)).translate(trans)
+
+
 def match_persona(c, name):
-    rows = do_query(c, 'SELECT p2.id, p2.name, p1.person_id, p2.official FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id  WHERE p1.name LIKE ? AND p1.official = 1 ORDER BY p1.person_id, p2.official DESC, p2.name', '%{}%'.format(name))
+    sname = normalize(name)
+
+    rows = do_query(c, 'SELECT p2.id, p2.name, p1.person_id, p2.official FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id  WHERE p1.search_name LIKE ? AND p1.official = 1 ORDER BY p1.person_id, p2.official DESC, p2.name', '%{}%'.format(sname))
 
     results = [[i[1] for i in gi] for _, gi in itertools.groupby(rows, lambda r: r[2])]
     # sort name groups by their header name
