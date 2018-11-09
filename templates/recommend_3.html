@@ -51,6 +51,12 @@
       <th>Recommendation</th>
       <td>{{ data['recommendation']|e|paragraphize|safe }}</td>
     </tr>
+    {% if data['events'] %}
+    <tr>
+      <th>Events</th>
+      <td>{{data['events']}}</td>
+    </tr>
+    {% endif %}
     {% if data['scribe'] or data['scribe_email'] %}
     <tr>
       <th>Scribe</th>
@@ -83,6 +89,7 @@
     <input type="hidden" name="award_names[]" value="{{i}}"/>
     {% endfor %}
     <input type="hidden" name="recommendation" value="{{data['recommendation']}}"/>
+    <input type="hidden" name="events" value="{{data['events'] or ''}}"/>
     <input type="hidden" name="scribe" value="{{data['scribe'] or ''}}"/>
     <input type="hidden" name="scribe_email" value="{{data['scribe_email'] or ''}}"/>
     <button id="submit" type="submit" value="Submit">Submit</button>

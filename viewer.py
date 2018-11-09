@@ -328,7 +328,7 @@ def search_modern(c, surname, forename):
         return render_template('choose_person.html', matches=matches)
 
 
-trans = str.maketrans({
+SEARCH_TRANS = str.maketrans({
     'Æ': 'Ae',
     'æ': 'ae',
     'Œ': 'Oe',
@@ -344,7 +344,7 @@ trans = str.maketrans({
 
 
 def normalize(s):
-    return ''.join(c for c in unicodedata.normalize('NFKD', s) if not unicodedata.combining(c)).translate(trans)
+    return ''.join(c for c in unicodedata.normalize('NFKD', s) if not unicodedata.combining(c)).translate(SEARCH_TRANS)
 
 
 def match_persona(c, name):
