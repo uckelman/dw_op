@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import datetime
 import itertools
 import os
 import re
@@ -425,6 +426,14 @@ def paragraphize(text):
     return '\n\n'.join('<p>{}</p>'.format(p) for p in paras)
 
 
+REC_CSV_TRANS = str.maketrans({
+    '\n': ' ',
+    '\r': ' ',
+    '"':  None,
+    '\'': None
+})
+
+
 @app.route('/recommend', methods=['GET', 'POST'])
 def recommend():
 
@@ -531,6 +540,9 @@ def recommend():
         elif state == 3:
             your_email = stripped(request.form, 'your_email')
 
+            rec = stripped(request.form, 'recommendation')
+            rec_sanitized = rec.translate(REC_CSV_TRANS)
+
             body_vars = {
                 'your_forename': stripped(request.form, 'your_forename'),
                 'your_surname': stripped(request.form, 'your_surname'),
@@ -541,10 +553,12 @@ def recommend():
                 'gender': stripped(request.form, 'gender'),
                 'branch': stripped(request.form, 'branch'),
                 'award_names': ', '.join(request.form.getlist('award_names[]')),
-                'recommendation': stripped(request.form, 'recommendation'),
+                'recommendation': rec,
+                'recommendation_sanitized': rec_sanitized,
                 'events': stripped(request.form, 'events'),
                 'scribe': stripped(request.form, 'scribe') or '',
-                'scribe_email': stripped(request.form, 'scribe_email') or ''
+                'scribe_email': stripped(request.form, 'scribe_email') or '',
+                'date': datetime.date.today()
             }
 
             body_fmt = '''
@@ -574,6 +588,13 @@ For the following awards: {award_names}
 
             if body_vars['scribe'] or body_vars['scribe_email']:
                 body_fmt += '\nSuggested scribe: {scribe} {scribe_email}'
+
+            body_fmt += '''
+
+========== Pasteable summary ==========
+Date | Recommender's Real Name | Recommender's SCA Name | Recommender's Email Address | SCA Name | Time in the SCA | Gender | Local Group | Awards | Events Person Will Attend | Suggested Scribe Name | Suggested Scribe Email Address | Reason for Recommendation
+{date}|{your_forename} {your_surname}|{your_persona}|{your_email}|{persona}|{time_served}|{gender}|{branch}|{award_names}|{events}|{scribe}|{scribe_email}|{recommendation_sanitized}
+'''
 
             body = body_fmt.format(**body_vars)
 
