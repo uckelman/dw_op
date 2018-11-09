@@ -570,13 +570,13 @@ Recommendation of {persona}
 '''
 
             if body_vars['time_served']:
-                body_fmt += 'Time in the Society: {time_served}\n'
+                body_fmt += '\nTime in the Society: {time_served}'
 
             if body_vars['gender']:
-                body_fmt += 'Gender: {gender}\n'
+                body_fmt += '\nGender: {gender}'
 
             if body_vars['branch']:
-                body_fmt += 'Branch: {branch}\n'
+                body_fmt += '\nBranch: {branch}'
 
             body_fmt += '''
 For the following awards: {award_names}
