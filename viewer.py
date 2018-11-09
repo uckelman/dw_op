@@ -497,6 +497,8 @@ def recommend():
             crowns = request.form.getlist('crowns[]', type=int)
             recommendation = stripped(request.form, 'recommendation')
 
+            events = stripped(request.form, 'events')
+
             scribe = stripped(request.form, 'scribe')
             scribe_email = stripped(request.form, 'scribe_email')
 
@@ -519,6 +521,7 @@ def recommend():
                 'crowns': crowns,
                 'crown_names': crown_names,
                 'recommendation': recommendation,
+                'events': events,
                 'scribe': scribe,
                 'scribe_email': scribe_email
             }
@@ -539,6 +542,7 @@ def recommend():
                 'branch': stripped(request.form, 'branch'),
                 'award_names': ', '.join(request.form.getlist('award_names[]')),
                 'recommendation': stripped(request.form, 'recommendation'),
+                'events': stripped(request.form, 'events'),
                 'scribe': stripped(request.form, 'scribe') or '',
                 'scribe_email': stripped(request.form, 'scribe_email') or ''
             }
@@ -565,6 +569,8 @@ For the following awards: {award_names}
 
 {recommendation}
 '''
+            if body_vars['events']:
+                body_fmt += '\nEvents: {events}'
 
             if body_vars['scribe'] or body_vars['scribe_email']:
                 body_fmt += '\nSuggested scribe: {scribe} {scribe_email}'
