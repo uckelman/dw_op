@@ -407,7 +407,7 @@ def search():
                 throw_if(forename, surname, persona, begin, end, award)
                 return redirect(url_for('crown', crown_id=crown))
             elif award:
-                throw_if(prename, surname, persona, begin, end, crown)
+                throw_if(forename, surname, persona, begin, end, crown)
                 return redirect(url_for('award', award=award))
         except Exception as e:
             flash(e.message, 'error')
