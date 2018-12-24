@@ -603,7 +603,12 @@ Date | Recommender's Real Name | Recommender's SCA Name | Recommender's Email Ad
             crowns = request.form.getlist('crowns[]', type=int)
 
             crown_emails = {
-                 2: ['king@drachenwald.sca.org', 'queen@drachenwald.sca.org'],
+                 2: [
+                        'king@drachenwald.sca.org',
+                        'queen@drachenwald.sca.org',
+                        'crownprince@drachenwald.sca.org',
+                        'crownprincess@drachenwald.sca.org'
+                    ],
                 27: ['prince@insulaedraconis.org', 'princess@insulaedraconis.org'],
                  3: ['furste@nordmark.org', 'furstinna@nordmark.org'],
                  4: ['paroni@aarnimetsa.org', 'paronitar@aarnimetsa.org'],
