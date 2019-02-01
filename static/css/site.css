@@ -266,3 +266,10 @@ ul.mhlist li::before {
 ul.mhlist li:first-child::before {
   content: '';
 }
+
+.notice {
+  border: 1px solid red;
+  border-radius: 5px;
+  background-color: #ffcccc;
+  padding: 0.25em;
+}
