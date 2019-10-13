@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block title %}500 Internal Server Error{% endblock %}
 {% block content %}
-<h1>You broke it!</h1>
-<h2>This is why we can't have nice things!</h2>
+<h1>Something went wrong!</h1>
 <p>The exception was:</p>
 <pre>{{ ex }}</pre>
+<p>Please report the problem to <a href="mail:webmaster@op.drachenwald.sca.org">webmaster@op.drachenwald.sca.org</a>, with a description of what you were doing and a copy of the exception above.</p>
 {% endblock %}

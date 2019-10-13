@@ -82,6 +82,10 @@ p {
   hyphens: auto;
 }
 
+pre {
+  margin-bottom: 1em;
+}
+
 th {
   font-weight: normal;
   text-align: left;
