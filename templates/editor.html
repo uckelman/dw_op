@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta charset="utf-8">
+
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/tablesort.css') }}"/>
+  <script src="{{ url_for('static', filename='js/tablesort.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/tablesort.number.min.js') }}"></script>
+
+  <style type="text/css">
+    .edit, .delete, .add, .update, .undo {
+      cursor: pointer;
+    }
+
+    .disabled {
+      cursor: default;
+      color: #CCCCCC;
+    }
+
+    body.wait * {
+      cursor: wait;
+    }
+
+    input {
+      box-sizing: border-box;
+      width: 100%;
+    }
+
+    /* TODO: right-align numeric columns */
+    th, td {
+      padding: 0 0.25em 0 0.25em;
+    }
+
+    #the_table_body tr:hover {
+      background-color: #EEEEEE; 
+    }
+
+    #error {
+      border: 2px solid #FF0000;
+      border-radius: 0.5em;
+      background-color: #FFCCCC;
+      padding: 0.25em;
+    }
+  </style>
+
+  <script src="{{ url_for('static', filename='js/mvc.js') }}" type="application/javascript"></script>
+
+  <script language="javascript">
+    window.addEventListener('load', async () => {
+      window.app = {};
+      window.app.model = new {{model_type}}();
+      window.app.view = new View(window.app.model);
+      window.app.controller = new Controller(window.app.model, window.app.view);
+
+      console.log("Started!");
+    });
+  </script>
+
+</head>
+<body>
+<!--
+  <div id="error">
+  </div>
+-->
+  {% for t in tables %}
+    <a href="#" onclick="window.app.controller.showTable('{{t}}'); return false;">{{t}}</a>
+  {% endfor %}
+
+  <table id="the_table">
+    <thead id="the_table_header">
+    </thead>
+    <tbody id="the_table_body">
+    </tbody>
+  </table>
+</body>
+</html>

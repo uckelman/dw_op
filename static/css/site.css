@@ -277,3 +277,25 @@ ul.mhlist li:first-child::before {
   background-color: #ffcccc;
   padding: 0.25em;
 }
+
+.row-delete {
+  color: #770000;
+  cursor: pointer;
+}
+
+.row-delete:hover {
+  color: #FF0000;
+}
+
+.row-add {
+  color: #007700;
+  cursor: pointer;
+}
+
+.row-add:hover {
+  color: #00BB00;
+}
+
+.empty-row {
+  display: none;
+}
