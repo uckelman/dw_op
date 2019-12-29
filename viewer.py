@@ -3,6 +3,7 @@
 import datetime
 import itertools
 import os
+import os.path
 import re
 import sqlite3
 import textwrap
@@ -78,8 +79,10 @@ def logout():
 @app.route('/')
 @login_required
 def front():
+    last_updated = datetime.date.fromtimestamp(os.path.getmtime(app.config['DB_PATH']))
     return render_template(
-        'front.html'
+        'front.html',
+        last_updated=last_updated
     )
 
 
