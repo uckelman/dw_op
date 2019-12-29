@@ -79,7 +79,6 @@ def logout():
 
 
 @app.route('/')
-@login_required
 def front():
     last_updated = datetime.date.fromtimestamp(os.path.getmtime(app.config['DB_PATH']))
     return render_template(
@@ -707,6 +706,7 @@ def api_list_tables(c):
 
 
 @app.route('/api/tables', methods=['GET'])
+@login_required
 def api_tables():
     db = get_db()
     c = db.cursor()
@@ -714,6 +714,7 @@ def api_tables():
 
 
 @app.route('/api/<table>', methods=['GET', 'POST'])
+@login_required
 def api_table(table):
     db = get_db()
     c = db.cursor()
@@ -734,6 +735,7 @@ def api_table(table):
 
 
 @app.route('/api/<table>/<int:id>', methods=['GET', 'PATCH', 'DELETE'])
+@login_required
 def api_table_id(table, id):
     db = get_db()
     c = db.cursor()
@@ -757,6 +759,7 @@ def api_table_id(table, id):
 
 
 @app.route('/posthorn/editor')
+@login_required
 def show_posthorn_editor():
     tables = json.loads(api_list_tables(get_db().cursor()))
 
@@ -766,7 +769,9 @@ def show_posthorn_editor():
         model_type='PosthornModel'
     )
 
+
 @app.route('/signet/editor')
+@login_required
 def show_signet_editor():
 #    tables = json.loads(api_list_tables(get_db().cursor()))
     tables = ['awards', 'scribes', 'scroll_status']
