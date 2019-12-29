@@ -3,19 +3,19 @@
 {% block content %}
 <div id="content">
   <h1>Armorial</h1>
- 
+
   <div id="armorial">
     <table>
       {% for i in results -%}
       {% if loop.index0 % columns == 0 %}
       <tr>
       {% endif %}
-        <td class="emblazon_small"> 
+        <td class="emblazon_small">
           <a href="{{ url_for('persona', name=i[0]) }}"><img src="{{ url_for('static', filename='images/arms/' + i[1]) }}"/> {{i[0]}}</a>
-        </td> 
+        </td>
       {% if loop.index0 % columns == columns - 1 %}
       </tr>
-      {% endif %}      
+      {% endif %}
       {% endfor %}
     </table>
   </div>

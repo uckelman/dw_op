@@ -160,7 +160,7 @@ var c = [...new Set(a.map(x => x[1]))];
 c.forEach(x => x.addEventListener("change", function(event) {
   if (x.checked) {
     c.forEach(y => y.setCustomValidity(""));
-  } 
+  }
 }));
 
 var submit = document.getElementById("submit");

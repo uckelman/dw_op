@@ -29,7 +29,7 @@ async function loadTable(table) {
     console.log(response);
     throw new Error(msg);
   }
-  
+
   return await response.json();
 }
 
@@ -163,7 +163,7 @@ class SignetModel extends Model {
       'awards': {
         'readonly': ['id', 'type_id', 'persona_id', 'crown_id', 'event_id', 'date', 'award_types.name', 'personae.name', 'crowns.name', 'events.name'],
         'hide': ['id', 'type_id', 'persona_id', 'crown_id', 'event_id'],
-        'insert': false, 
+        'insert': false,
         'joins': [
           {
             'join': 'scribes',
@@ -245,7 +245,7 @@ function makeHeaders(columnNames, spec, jtabs, thead) {
     }
   }
 
-  // headers for join columns 
+  // headers for join columns
   for (let j of jtabs) {
     for (let jcol of j['cols']) {
       let th = thead_row.appendChild(document.createElement('th'));
@@ -404,7 +404,7 @@ function updateButtonsEdit() {
     for (let b of document.getElementsByClassName('data_row button')) {
       b.classList.remove('disabled');
     }
-  } 
+  }
 }
 
 function clearInputRow() {
@@ -416,7 +416,7 @@ function clearInputRow() {
 }
 
 function clearTable() {
-  let table = document.getElementById('the_table');      
+  let table = document.getElementById('the_table');
   let thead = document.getElementById('the_table_header');
   let tbody = document.getElementById('the_table_body');
 
@@ -454,10 +454,10 @@ class View {
     let thead = document.getElementById('the_table_header');
     let tbody = document.getElementById('the_table_body');
 
-    makeDataLists(jtabs, model.table_data); 
+    makeDataLists(jtabs, model.table_data);
     makeHeaders(cols, spec, jtabs, thead);
     this.makeInsertRow(cols, spec, jtabs, thead);
- 
+
     for (let id in data) {
       this.makeDataRow(table, cols, spec, jtabs, data[id], model.table_data, tbody, -1);
     }
@@ -488,7 +488,7 @@ class View {
         let td = tr.insertCell();
         td.innerText = join_row[jcol];
       }
-    } 
+    }
 
     // edit button
     let edit = tr.insertCell();
@@ -496,7 +496,7 @@ class View {
     edit.innerText = '✎';
     edit.addEventListener('click', () => {
       if (!edit.classList.contains('disabled')) {
-        const index = tr.rowIndex-2; 
+        const index = tr.rowIndex-2;
         this.removeDataRow(id);
         this.makeEditableRow(tname, cols, spec, jtabs, row, table_data, tbody, index);
       }
@@ -536,7 +536,7 @@ class View {
   updateDataRow(id) {
     let tr = document.getElementById(rowId(id));
     const index = tr.rowIndex - 2;
-    tr.parentNode.removeChild(tr); 
+    tr.parentNode.removeChild(tr);
 
     const table = this.controller.table;
     const table_data = this.model.table_data;
@@ -584,7 +584,7 @@ class View {
       input.addEventListener('input', updateButtons);
     }
 
-    // inputs for join columns 
+    // inputs for join columns
     for (let j of jtabs) {
       for (let jcol of j['cols']) {
         // create record inputs
@@ -607,7 +607,7 @@ class View {
           let dl = this.list;
   // TODO: binary search
           for (let o of dl.options) {
-            if (o.value === this.value) { 
+            if (o.value === this.value) {
               on_input.value = o.getAttribute('data-id');
               this.setCustomValidity('');
               updateButtons();
@@ -675,15 +675,15 @@ class View {
 
       let input = td.appendChild(document.createElement('input'));
       input.type = 'text';
-      input.value = row[col]; 
-      input.setAttribute('data-original_value', input.value); 
+      input.value = row[col];
+      input.setAttribute('data-original_value', input.value);
       input.id = editCellId(col);
       input.setAttribute('data-input_for', col);
       input.classList.add('edit_row', 'input');
       input.addEventListener('input', updateButtonsEdit);
     }
 
-    // join columns 
+    // join columns
     for (let j of jtabs) {
       const join_row = table_data[j['join']][row[j['on']]];
       for (let jcol of j['cols']) {
@@ -699,7 +699,7 @@ class View {
         let input = td.appendChild(document.createElement('input'));
         input.type = 'text';
         input.value = join_row[jcol];
-        input.setAttribute('data-original_value', input.value); 
+        input.setAttribute('data-original_value', input.value);
         input.autocomplete = 'on';
         input.id = editJoinCellId(j['join'], jcol);
         input.classList.add('edit_row', 'input');
@@ -709,7 +709,7 @@ class View {
           let dl = this.list;
   // TODO: binary search
           for (let o of dl.options) {
-            if (o.value === this.value) { 
+            if (o.value === this.value) {
               on_input.value = o.getAttribute('data-id');
               this.setCustomValidity('');
               updateButtonsEdit();
@@ -724,7 +724,7 @@ class View {
     }
 
     // update button
-    let update = tr.insertCell(); 
+    let update = tr.insertCell();
     update.innerText = '✓';
     update.classList.add('edit_row', 'button', 'update');
     update.addEventListener('click', () => {
@@ -746,7 +746,7 @@ class View {
     });
 
     // undo button
-    let undo = tr.insertCell(); 
+    let undo = tr.insertCell();
     undo.innerText = '⮌';
     undo.classList.add('edit_row', 'button', 'undo');
     undo.addEventListener('click', () => {
@@ -828,7 +828,7 @@ class Controller {
       setError(msg);
       throw new Error(msg);
     }
-    
+
     const json = await response.json();
     const id = json['id'];
 
