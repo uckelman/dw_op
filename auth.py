@@ -73,4 +73,3 @@ def handle_logout(logout_teardown):
         logout_teardown(username)
         flash('Goodbye, ' + username + '.', 'notice')
     return redirect(url_for('login'))
-
