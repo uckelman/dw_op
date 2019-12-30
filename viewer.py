@@ -248,7 +248,8 @@ def op():
              500: 'Grant of Arms awards',
              400: 'Grant of Arms',
              300: 'Award of Arms awards',
-             200: 'Award of Arms'
+             200: 'Award of Arms',
+             100: 'All awards'
         }
 
         results = itertools.groupby(results, key=lambda r: r[2])
