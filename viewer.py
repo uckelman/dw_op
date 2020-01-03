@@ -449,11 +449,11 @@ def recommend():
         state = request.form.get('state', default=0, type=int)
 
         if state == 0:
-            persona_search = stripped(request.form, 'persona_search')
+            persona_search = normalize(stripped(request.form, 'persona_search'))
 
             c = get_db().cursor()
 
-            rows = do_query(c, 'SELECT p2.id, p2.name, p1.person_id, p2.official FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id  WHERE p1.name LIKE ? AND p1.official = 1 ORDER BY p1.person_id, p2.official DESC, p2.name', '%{}%'.format(persona_search))
+            rows = do_query(c, 'SELECT p2.id, p2.name, p1.person_id, p2.official FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id  WHERE p1.search_name LIKE ? AND p1.official = 1 ORDER BY p1.person_id, p2.official DESC, p2.name', '%{}%'.format(persona_search))
 
             results = [[(i[0], i[1]) for i in gi] for _, gi in itertools.groupby(rows, lambda r: r[2])]
             results.sort(key=lambda x: (x[0][1].casefold(), x[0][1]))
