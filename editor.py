@@ -181,7 +181,7 @@ def api_table_id(table, id):
         raise ValueError
 
 
-@app.route('/posthorn/editor')
+@app.route('/posthorn')
 @login_required
 def show_posthorn_editor():
     tables = json.loads(api_list_tables(get_db().cursor()))
@@ -193,7 +193,7 @@ def show_posthorn_editor():
     )
 
 
-@app.route('/signet/editor')
+@app.route('/signet')
 @login_required
 def show_signet_editor():
 #    tables = json.loads(api_list_tables(get_db().cursor()))
