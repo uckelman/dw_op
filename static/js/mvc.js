@@ -21,7 +21,13 @@ function setError(msg) {
 
 async function loadTable(table) {
 // TODO: error handling
-  const response = await fetch('/api/' + table, {method: 'GET'});
+  const response = await fetch(
+    '/editor/api/' + table,
+    {
+      method: 'GET',
+      credentials: 'same-origin'
+    }
+  );
 
   if (!response.ok) {
     const msg = 'HTTP error, status = ' + response.status;
@@ -795,8 +801,14 @@ class Controller {
   async deleteRow(id) {
     console.log("Going to delete row " + id);
 
-    const url = '/api/' + this.table + '/' + id;
-    const response = await fetch(url, {method: 'DELETE'});
+    const url = '/editor/api/' + this.table + '/' + id;
+    const response = await fetch(
+      url,
+      {
+        method: 'DELETE',
+        credentials: 'same-origin'
+      }
+    );
 
     if (!response.ok) {
       const msg = 'HTTP error, status = ' + response.status;
@@ -813,6 +825,7 @@ class Controller {
 
     const params = {
       method: 'POST',
+      credentials: 'same-origin',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
@@ -820,7 +833,7 @@ class Controller {
       body: JSON.stringify(row)
     };
 
-    const response = await fetch('/api/' + this.table, params);
+    const response = await fetch('/editor/api/' + this.table, params);
 
     if (!response.ok) {
 // TODO: handle error better
@@ -841,6 +854,7 @@ class Controller {
 
     const params = {
       method: 'PATCH',
+      credentials: 'same-origin',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
@@ -848,7 +862,7 @@ class Controller {
       body: JSON.stringify(row)
     };
 
-    const response = await fetch('/api/' + this.table + '/' + id, params);
+    const response = await fetch('/editor/api/' + this.table + '/' + id, params);
 
     if (!response.ok) {
       const msg = 'HTTP error, status = ' + response.status;
