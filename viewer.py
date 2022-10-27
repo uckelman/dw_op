@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+# -*- coding: utf-8 -*-
 
 import datetime
 import itertools
@@ -10,12 +11,18 @@ import sqlite3
 import textwrap
 import traceback
 import unicodedata
+import base64
+from email.message import EmailMessage
+
+from google.oauth2 import service_account
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
 
 from flask import Flask, flash, g, redirect, render_template, request, Response, url_for
 from flask_mail import Mail, Message
 
 from auth import User, handle_login, handle_logout, login_required
-
+from urllib.parse import unquote
 
 def default_config():
     return dict(
@@ -28,8 +35,6 @@ app = Flask(__name__)
 app.config.update(default_config())
 app.config.from_pyfile('config.py')
 app.config['USERS'] = { x[0]: User(*x) for x in app.config['USERS'] }
-
-mail = Mail(app)
 
 
 def connect_db():
@@ -99,8 +104,11 @@ def privacy():
 @app.route('/persona/<name>', methods=['GET'])
 def persona(name):
     c = get_db().cursor()
+    import urllib.parse
+    uname = urllib.parse.unquote(name)
+    query_rst = do_query(c, 'SELECT people.id, people.surname IS NOT NULL OR people.forename IS NOT NULL, regions.name, people.blazon, people.emblazon FROM personae JOIN people ON personae.person_id = people.id JOIN regions ON people.region_id = regions.id WHERE personae.name = ?', uname)[0]
 
-    person_id, has_modname, region, blazon, emblazon = do_query(c, 'SELECT people.id, people.surname IS NOT NULL OR people.forename IS NOT NULL, regions.name, people.blazon, people.emblazon FROM personae JOIN people ON personae.person_id = people.id JOIN regions ON people.region_id = regions.id WHERE personae.name = ?', name)[0]
+    person_id, has_modname, region, blazon, emblazon = query_rst 
 
     official_id, official_name = do_query(c, 'SELECT id, name FROM personae WHERE person_id = ? AND official = 1', person_id)[0];
 
@@ -113,7 +121,7 @@ def persona(name):
     else:
         emblazon = '<div class="emblazon noarms"><div>I have not given<br/>Post Horn my<br/> registered<br/> arms.</div></div>'
 
-    awards = do_query(c, 'SELECT p2.name, award_types.name, awards.date, crowns.name, events.name FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id JOIN events ON awards.event_id = events.id LEFT OUTER JOIN crowns ON awards.crown_id = crowns.id WHERE p1.name = ? ORDER BY awards.date, award_types.name', name)
+    awards = do_query(c, 'SELECT p2.name, award_types.name, awards.date, crowns.name, events.name FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id JOIN events ON awards.event_id = events.id LEFT OUTER JOIN crowns ON awards.crown_id = crowns.id WHERE p1.name = ? ORDER BY awards.date, award_types.name', uname)
 
     return render_template(
         'persona.html',
@@ -133,12 +141,12 @@ def persona(name):
 def person(surname, forename):
     c = get_db().cursor()
 
-    awards = do_query(c, 'SELECT award_types.name, awards.date, crowns.name, events.name FROM awards JOIN personae ON awards.persona_id = personae.id JOIN people ON personae.person_id = people.id JOIN award_types ON awards.type_id = award_types.id JOIN events ON awards.event_id = events.id LEFT OUTER JOIN crowns ON awards.crown_id = crowns.id WHERE people.surname = ? AND people.forename = ? ORDER BY awards.date, award_types.name', surname, forename)
+    awards = do_query(c, 'SELECT award_types.name, awards.date, crowns.name, events.name FROM awards JOIN personae ON awards.persona_id = personae.id JOIN people ON personae.person_id = people.id JOIN award_types ON awards.type_id = award_types.id JOIN events ON awards.event_id = events.id LEFT OUTER JOIN crowns ON awards.crown_id = crowns.id WHERE people.surname = ? AND people.forename = ? ORDER BY awards.date, award_types.name', unquote(surname), unquote(forename))
 
     return render_template(
         'person.html',
-        surname=surname,
-        forename=forename,
+        surname=unquote(surname),
+        forename=unquote(forename),
         awards=awards
     )
 
@@ -639,8 +647,45 @@ Date | Recommender's Real Name | Recommender's SCA Name | Recommender's Email Ad
                 body=body
             )
 
-            mail.send(msg)
-
+            #mail.send(msg)
+            try:
+                scopes = ['https://www.googleapis.com/auth/gmail.send', 'https://www.googleapis.com/auth/gmail.compose']
+                cred_info = {"type": "service_account",
+                             "project_id": "dw-order-of-precedence",
+                             "private_key_id": GOOGLE_KEY_ID,
+                             "private_key": GOOGLE_KEY_SECRET,
+                             "client_email": "artificial-deputy-for-the-orde@dw-order-of-precedence.iam.gserviceaccount.com",
+                             "client_id": "111021806773359996540",
+                             "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                             "token_uri": "https://oauth2.googleapis.com/token",
+                             "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+                             "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/artificial-deputy-for-the-orde%40dw-order-of-precedence.iam.gserviceaccount.com"
+                }
+            
+                
+                credentials = service_account.Credentials.from_service_account_info(info=cred_info, scopes=scopes)
+            
+                service = build('gmail', 'v1', credentials=credentials.with_subject('recommendations@drachenwald.sca.org'))
+                message = EmailMessage()
+            
+                message.set_content(body)
+                message['To'] = to
+                message['Cc'] = [your_email]
+                message['From']= cred_info["client_email"]
+                message['Subject'] = 'Recommendation'
+            
+                encoded_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
+                create_message = {
+                            'raw': encoded_message
+                    }
+                # pylint: disable=E1101
+                
+                send_message = (service.users().messages().send
+                                (userId="me", body=create_message).execute())
+            except HttpError as error:
+                print('An error occurred: {error} please let the webminister know by sending an email to webminister@drachenwald.sca.org')
+                send_message = None    
+    
             state = 4
 
     return render_template(
