@@ -131,7 +131,8 @@ def persona(name):
         has_modname=has_modname,
         blazon=blazon,
         emblazon=emblazon,
-        awards=awards
+        awards=awards,
+        persona_id=official_id
     )
 
 
