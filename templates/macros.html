@@ -4,12 +4,16 @@
 {%- endmacro %}
 
 {% macro navlist() -%}
+  <ul class="mhList">
+    <ol>Recommend this person for an award</ol>
+    <ol><a href="https://docs.google.com/forms/d/1T8rvYTbPVZLdXIZU9rLi5Oj5lb9KYbjjoljQvSvyx44/prefill">Submit a correction</a></ol>
+  </ul>
   <ul class="mhlist">
     <li><a href="{{ url_for('search') }}">Search</a></li>
     <li><a href="{{ url_for('awards') }}">Awards</a></li>
     <li><a href="{{ url_for('op') }}">OP</a></li>
     <li><a href="{{ url_for('reigns') }}">Reigns</a></li>
     <li><a href="{{ url_for('armorial') }}">Armorial</a></li>
-    <li><a href="{{ url_for('recommend') }}">Recommend</a></li>
+    <li><a href="{{ url_for('recommend') }}">Recommend Somebody for an award</a></li>
   </ul>
 {%- endmacro %}
