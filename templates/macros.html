@@ -3,12 +3,15 @@
   <script src="{{ url_for('static', filename='js/tablesort.min.js') }}"></script>
 {%- endmacro %}
 
-{% macro navlist() -%}
+{% macro personnavlist() -%}
   <ul class="mhList">
     <ol>Recommend this person for an award</ol>
     <ol><a href="https://docs.google.com/forms/d/1T8rvYTbPVZLdXIZU9rLi5Oj5lb9KYbjjoljQvSvyx44/prefill">Submit a correction</a></ol>
   </ul>
-  <ul class="mhlist">
+{%- endmacro %}
+
+{% macro navlist() -%}
+ <ul class="mhlist">
     <li><a href="{{ url_for('search') }}">Search</a></li>
     <li><a href="{{ url_for('awards') }}">Awards</a></li>
     <li><a href="{{ url_for('op') }}">OP</a></li>

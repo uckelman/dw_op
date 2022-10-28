@@ -8,6 +8,11 @@
 <div id="content">
   <div id="details">
     <h1>{{forename}}{{ ' ' if forename and surname}}{{surname}}</h1>
+        <ul class="mhList">
+    <ol>Recommend this person for an award</ol>
+
+    <ol><a href="https://docs.google.com/forms/d/e/1FAIpQLSdtLQV7XY9ehFnc5T65Q5vPCFZMCB8hUc458JTw34rPRjdipw/viewform?usp=pp_url&entry.2122792637={{forename}}+{{surname}}&entry.1114613229=http://op.drachenwald.sca.org{{request.path}}">Submit a correction</a></ol>
+  </ul>
   </div>
   <div id="awards">
     {% if awards %}
@@ -33,6 +38,7 @@
     </table>
     {% endif %}
   </div>
+
 </div>
 
 <script>
@@ -41,3 +47,4 @@
   }
 </script>
 {% endblock %}
+
