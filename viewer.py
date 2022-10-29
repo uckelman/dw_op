@@ -24,6 +24,8 @@ from flask_mail import Mail, Message
 from auth import User, handle_login, handle_logout, login_required
 from urllib.parse import unquote
 
+import config
+
 def default_config():
     return dict(
         SECRET_KEY=os.urandom(128),
@@ -365,7 +367,8 @@ def normalize(s):
 def match_persona(c, name):
     sname = normalize(name)
 
-    rows = do_query(c, 'SELECT p2.id, p2.name, p1.person_id, p2.official FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id  WHERE p1.search_name LIKE ? AND p1.official = 1 ORDER BY p1.person_id, p2.official DESC, p2.name', '%{}%'.format(sname))
+    #rows = do_query(c, 'SELECT p2.id, p2.name, p1.person_id, p2.official FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id  WHERE p1.search_name LIKE ? AND p1.official = 1 ORDER BY p1.person_id, p2.official DESC, p2.name', '%{}%'.format(sname))
+    rows = do_query(c,'SELECT p2.id, p2.name, p1.person_id, p2.official FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id  WHERE p1.search_name LIKE ?  ORDER BY p1.person_id, p2.official DESC, p2.name', '%{}%'.format(sname))
 
     results = [[i[1] for i in gi] for _, gi in itertools.groupby(rows, lambda r: r[2])]
     # sort name groups by their header name
