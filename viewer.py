@@ -486,7 +486,7 @@ def recommend():
 
             data['in_op'] = persona_id is not None
 
-            data['unawards'] = do_query(c, 'SELECT award_types.id, award_types.name, CASE award_types.group_id WHEN 1 THEN 2 ELSE award_types.group_id END AS group_id, award_types.precedence FROM award_types LEFT JOIN (SELECT award_types.id FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id WHERE p1.id = ?) AS a ON award_types.id = a.id WHERE award_types.group_id IN (1, 2, 3, 4, 5, 25, 27, 30) AND (award_types.open = 1 OR award_types.open IS NULL) AND award_types.id NOT IN (16, 27, 28, 29, 30, 49) AND a.id IS NULL ORDER BY group_id, award_types.precedence, award_types.name' , persona_id)
+            data['unawards'] = do_query(c, 'SELECT award_types.id, award_types.name, CASE award_types.group_id WHEN 1 THEN 2 ELSE award_types.group_id END AS group_id, award_types.precedence FROM award_types LEFT JOIN (SELECT award_types.id FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id WHERE p1.id = ?) AS a ON award_types.id = a.id WHERE award_types.group_id IN (1, 2, 3, 4, 5, 25, 27, 30, 42) AND (award_types.open = 1 OR award_types.open IS NULL) AND award_types.id NOT IN (16, 27, 28, 29, 30, 49) AND a.id IS NULL ORDER BY group_id, award_types.precedence, award_types.name' , persona_id)
 
             data['unawards'] = { g: list(gi) for g, gi in
                 itertools.groupby(data['unawards'], lambda x: x[2])
@@ -507,9 +507,9 @@ def recommend():
                 4: 'Aarnimetsä',
                 30: 'Gotvik',
                 5: 'Knight\'s Crossing',
-                25: 'Styringheim'
+                25: 'Styringheim',
+                42: 'Eplaheimr'
             }
-
             state = 2
 
         elif state == 2:
