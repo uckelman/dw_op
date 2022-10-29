@@ -638,7 +638,8 @@ Date | Recommender's Real Name | Recommender's SCA Name | Recommender's Email Ad
                  4: ['paroni@aarnimetsa.org', 'paronitar@aarnimetsa.org'],
                 30: ['baron@gotvik.se', 'baroness@gotvik.se'],
                  5: ['baron@knightscrossing.org', 'baronin@knightscrossing.org'],
-                25: ['baron@styringheim.se', 'baronessa@styringheim.se']
+                25: ['baron@styringheim.se', 'baronessa@styringheim.se'],
+                42: ['baron.eplaheimr@gmail.com', 'baroness.eplaheimr@gmail.com']
             }
 
             to = [a for c in crowns for a in crown_emails[c]]
