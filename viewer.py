@@ -123,7 +123,7 @@ def persona(name):
     else:
         emblazon = '<div class="emblazon noarms"><div>I have not given<br/>Post Horn my<br/> registered<br/> arms.</div></div>'
 
-    awards = do_query(c, 'SELECT p2.name, award_types.name, awards.date, crowns.name, events.name FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id JOIN events ON awards.event_id = events.id LEFT OUTER JOIN crowns ON awards.crown_id = crowns.id WHERE p1.name = ? ORDER BY awards.date, award_types.name', uname)
+    awards = do_query(c, 'SELECT DISTINCT p2.name, award_types.name, awards.date, crowns.name, events.name FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id JOIN events ON awards.event_id = events.id LEFT OUTER JOIN crowns ON awards.crown_id = crowns.id WHERE p1.name = ? ORDER BY awards.date, award_types.name', uname)
 
     return render_template(
         'persona.html',
@@ -169,6 +169,7 @@ def awards():
     awards_kc = do_query(c, 'SELECT award_types.id, award_types.name FROM award_types WHERE award_types.group_id = 5 ORDER BY award_types.name')
     awards_st = do_query(c, 'SELECT award_types.id, award_types.name FROM award_types WHERE award_types.group_id = 25 ORDER BY award_types.name')
     awards_gv = do_query(c, 'SELECT award_types.id, award_types.name FROM award_types WHERE award_types.group_id = 30 ORDER BY award_types.name')
+    awards_ep = do_query(c, 'SELECT award_types.id, award_types.name FROM award_types WHERE award_types.group_id = 42 ORDER BY award_types.name')
 
     if request.method == 'POST':
         a_ids = [int(v) for v in request.form if v.isdigit()]
@@ -184,6 +185,7 @@ def awards():
         awards_kc=awards_kc,
         awards_st=awards_st,
         awards_gv=awards_gv,
+        awards_ep=awards_ep,
         results=results
     )
 
