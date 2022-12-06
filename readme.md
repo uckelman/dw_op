@@ -1,5 +1,7 @@
 # Set up your local environment (this assumes a mac terminal environment)
 
+# Create a sqllite file named op.sqlite with the contents of the op.sqlite.sql file
+
 pip install virtualenv
 
 virtualenv venv
