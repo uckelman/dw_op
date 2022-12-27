@@ -11,3 +11,12 @@ source ./venv/bin/activate
 pip install -r requirements.txt
 
 flask --app viewer run
+
+
+Alternative for flask --app viewer run:
+
+export FLASK_APP=viewer.py
+
+export FLASK_ENV=development
+
+flask run
