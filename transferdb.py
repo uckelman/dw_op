@@ -3,6 +3,11 @@ from sqlite3 import Error
 import mysql.connector
 
 
+app = Flask(__name__)
+app.config.update(default_config())
+app.config.from_pyfile('config.py')
+app.config['USERS'] = { x[0]: User(*x) for x in app.config['USERS'] }
+
 def create_connection(db_file):
     conn = None
     try:
@@ -13,7 +18,10 @@ def create_connection(db_file):
     return conn
 
 def create_mysql_connector():
-    cnx = mysql.connector.connect(user='oop', password='Oop_33!!', host='127.0.0.1', database='oop', autocommit=True)
+    mysqluser = app.config['DB_USER']
+    mysqlpwd = app.config['DB_PWD']
+    mysqldb = app.config['DB_DATABASE']
+    cnx = mysql.connector.connect(user=mysqluser, password=mysqlpwd, host='127.0.0.1', database=mysqldb, autocommit=True)
 
     return cnx
 
