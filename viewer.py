@@ -42,13 +42,17 @@ app.config['USERS'] = { x[0]: User(*x) for x in app.config['USERS'] }
 
 
 def connect_db():
-    mysqluser = app.config['DB_USER']
-    mysqlpwd = app.config['DB_PWD']
-    mysqldb = app.config['DB_DATABASE']
-    db = mysql.connector.connect(user=mysqluser, password=mysqlpwd, host='127.0.0.1', database=mysqldb, autocommit=True)
+    try:
+        mysqluser = app.config['DB_USER']
+        mysqlpwd = app.config['DB_PWD']
+        mysqldb = app.config['DB_DATABASE']
+        dbhost = app.config['DB_HOST']
+    
+        db = mysql.connector.connect(user=mysqluser, password=mysqlpwd, host=dbhost, database=mysqldb, autocommit=True)
 
-    return db
-
+        return db
+    except Exception as e:
+        raise ("error: %s - %s - %s" % (dbhost, database, e)) 
 
 def get_db():
     db = getattr(g, '_database', None)

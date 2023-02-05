@@ -1,12 +1,15 @@
+#from flask import Flask
 import sqlite3
 from sqlite3 import Error
 import mysql.connector
+import os
+import config
 
+#app = Flask(__name__)
+#app.config.update(default_config())
+#app.config.from_pyfile('config.py')
+#app.config['USERS'] = { x[0]: User(*x) for x in app.config['USERS'] }
 
-app = Flask(__name__)
-app.config.update(default_config())
-app.config.from_pyfile('config.py')
-app.config['USERS'] = { x[0]: User(*x) for x in app.config['USERS'] }
 
 def create_connection(db_file):
     conn = None
@@ -18,10 +21,13 @@ def create_connection(db_file):
     return conn
 
 def create_mysql_connector():
-    mysqluser = app.config['DB_USER']
-    mysqlpwd = app.config['DB_PWD']
-    mysqldb = app.config['DB_DATABASE']
-    cnx = mysql.connector.connect(user=mysqluser, password=mysqlpwd, host='127.0.0.1', database=mysqldb, autocommit=True)
+
+    mysqluser = DB_USER
+    mysqlpwd = DB_PWD
+    mysqldb = DB_DATABASE
+    dbhost = DB_HOST
+    
+    cnx = mysql.connector.connect(user=mysqluser, password=mysqlpwd, host=dbhost, database=mysqldb, autocommit=True)
 
     return cnx
 
@@ -66,11 +72,13 @@ def create_table_mysql(conn, sql):
 
 
 def drop_table_mysql(conn, table):
-    cur = conn.cursor()
+    try:
+        cur = conn.cursor()
     
-    deleteSql = "DROP TABLE IF EXISTS {}".format(table)
-    cur_execute(cur, deleteSql)
-    
+        deleteSql = "DROP TABLE IF EXISTS {}".format(table)
+        cur_execute(cur, deleteSql)
+    except Exception as e:
+        print("exception dropping tables: %s"%e)
     
 def get_sql_row(row):
     result = ""
@@ -121,11 +129,12 @@ def main():
 
     # create a sqlite database connection
     conn = create_connection(database)
+    print("created connection to sqlite")
     with conn:
         # create mysql database connection
         cnx = create_mysql_connector()
-        
-        with cnx:
+        print("created connection to mysql") 
+        try:
             print("Dropping tables")
             drop_table_mysql(cnx, "awards")
             drop_table_mysql(cnx, "personae")
@@ -143,7 +152,6 @@ def main():
             create_table_mysql(cnx, sql)
             dataCount = move_tables_data(conn, cnx, "regions", "(id, name)", False)
             print("regions rows {}".format(dataCount,))
-
             sql = "CREATE TABLE groups (id INTEGER PRIMARY KEY, name TEXT NOT NULL)"
             create_table_mysql(cnx, sql)
             dataCount = move_tables_data(conn, cnx, "groups", "(id, name)", False)
@@ -193,6 +201,8 @@ def main():
             create_table_mysql(cnx, sql)
             dataCount = move_tables_data(conn, cnx, "awards", "(id, type_id, persona_id, crown_id, event_id, date, scribe_id, scroll_status_id, scroll_updated, scroll_comment, provenance)", False)
             print("awards rows {}".format(dataCount,))
+        except Exception as e:
+           print("error: %s" %e)
 
             
 if __name__ == '__main__':

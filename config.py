@@ -1,10 +1,13 @@
 import os.path
 
-DB_USER = 'oop'
-DB_PWD = 'Oop_33!!'
-DB_DATABASE = 'oop'
+DB_USER = 'wiifmqgdwop'
+DB_PWD = 'MC3SQtqfY526rmch'
+DB_DATABASE = 'wiifmqgdwop'
+DB_HOST ='wiifmqgdwop.mysql.db'
 
 DISABLE_AUTH = False
+BASE_DIR = os.path.dirname(os.path.realpath(__file__))
+DB_PATH = os.path.join(BASE_DIR, 'op.sqlite')
 
 USERS = (
     (
