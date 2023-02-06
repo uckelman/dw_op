@@ -148,56 +148,56 @@ def main():
             drop_table_mysql(cnx, "groups")
             drop_table_mysql(cnx, "regions")
             
-            sql = "CREATE TABLE regions (id INTEGER PRIMARY KEY, name TEXT)"
+            sql = "CREATE TABLE regions (id INTEGER PRIMARY KEY, name TEXT)  DEFAULT CHARSET=utf8mb4"
             create_table_mysql(cnx, sql)
             dataCount = move_tables_data(conn, cnx, "regions", "(id, name)", False)
             print("regions rows {}".format(dataCount,))
-            sql = "CREATE TABLE groups (id INTEGER PRIMARY KEY, name TEXT NOT NULL)"
+            sql = "CREATE TABLE groups (id INTEGER PRIMARY KEY, name TEXT NOT NULL)  DEFAULT CHARSET=utf8mb4"
             create_table_mysql(cnx, sql)
             dataCount = move_tables_data(conn, cnx, "groups", "(id, name)", False)
             print("groups rows {}".format(dataCount,))
             
-            sql = "CREATE TABLE award_types (id INTEGER PRIMARY KEY, name TEXT NOT NULL, precedence INTEGER NOT NULL, group_id INTEGER NOT NULL REFERENCES groups(id), open INTEGER CHECK(open IN (0, 1, NULL)))"
+            sql = "CREATE TABLE award_types (id INTEGER PRIMARY KEY, name TEXT NOT NULL, precedence INTEGER NOT NULL, group_id INTEGER NOT NULL REFERENCES groups(id), open INTEGER CHECK(open IN (0, 1, NULL)))  DEFAULT CHARSET=utf8mb4"
             create_table_mysql(cnx, sql)
             dataCount = move_tables_data(conn, cnx, "award_types", "(id, name, precedence, group_id, open)", False)
             print("award_types rows {}".format(dataCount,))
 
-            sql = "CREATE TABLE crowns (id INTEGER PRIMARY KEY, name TEXT)"
+            sql = "CREATE TABLE crowns (id INTEGER PRIMARY KEY, name TEXT)  DEFAULT CHARSET=utf8mb4"
             create_table_mysql(cnx, sql)
             dataCount = move_tables_data(conn, cnx, "crowns", "(id, name)", False)
             print("crowns rows {}".format(dataCount,))
 
-            sql = "CREATE TABLE reigns (id INTEGER PRIMARY KEY, sov1 TEXT, sov2 TEXT, begin TEXT, end TEXT)"
+            sql = "CREATE TABLE reigns (id INTEGER PRIMARY KEY, sov1 TEXT, sov2 TEXT, begin TEXT, end TEXT)  DEFAULT CHARSET=utf8mb4"
             create_table_mysql(cnx, sql)
             dataCount = move_tables_data(conn, cnx, "reigns", "(id, sov1, sov2, begin, end)", False)
             print("reigns rows {}".format(dataCount,))
 
-            sql = "CREATE TABLE scribes(id INTEGER PRIMARY KEY, name TEXT NOT NULL, description TEXT)"
+            sql = "CREATE TABLE scribes(id INTEGER PRIMARY KEY, name TEXT NOT NULL, description TEXT)  DEFAULT CHARSET=utf8mb4"
             create_table_mysql(cnx, sql)
             dataCount = move_tables_data(conn, cnx, "scribes", "(id, name, description)", False)
             print("scribes rows {}".format(dataCount,))
 
-            sql = "CREATE TABLE scroll_status (id INTEGER PRIMARY KEY, name TEXT NOT NULL)"
+            sql = "CREATE TABLE scroll_status (id INTEGER PRIMARY KEY, name TEXT NOT NULL)  DEFAULT CHARSET=utf8mb4"
             create_table_mysql(cnx, sql)
             dataCount = move_tables_data(conn, cnx, "scroll_status", "(id, name)", False)
             print("scroll_status rows {}".format(dataCount,))            
 
-            sql = "CREATE TABLE events (id INTEGER, name TEXT NOT NULL, slug TEXT, provenance TEXT, PRIMARY KEY(id))"
+            sql = "CREATE TABLE events (id INTEGER, name TEXT NOT NULL, slug TEXT, provenance TEXT, PRIMARY KEY(id))  DEFAULT CHARSET=utf8mb4"
             create_table_mysql(cnx, sql)
             dataCount = move_tables_data(conn, cnx, "events", "(id, name, slug, provenance)", False)
             print("events rows {}".format(dataCount,))
             
-            sql = "CREATE TABLE people (id INTEGER, surname TEXT, forename TEXT, region_id INTEGER NOT NULL, blazon TEXT, emblazon TEXT, notes TEXT, PRIMARY KEY(id), FOREIGN KEY(region_id) REFERENCES regions(id))"
+            sql = "CREATE TABLE people (id INTEGER, surname TEXT, forename TEXT, region_id INTEGER NOT NULL, blazon TEXT, emblazon TEXT, notes TEXT, PRIMARY KEY(id), FOREIGN KEY(region_id) REFERENCES regions(id))  DEFAULT CHARSET=utf8mb4"
             create_table_mysql(cnx, sql)
             dataCount = move_tables_data(conn, cnx, "people", "(id, surname, forename, region_id, blazon, emblazon, notes)", False)
             print("people rows {}".format(dataCount,))
             
-            sql = "CREATE TABLE personae (id INTEGER PRIMARY KEY, name TEXT NOT NULL, person_id INTEGER NOT NULL REFERENCES people(id), official INTEGER NOT NULL CHECK(official IN (0, 1)), search_name TEXT)"
+            sql = "CREATE TABLE personae (id INTEGER PRIMARY KEY, name TEXT NOT NULL, person_id INTEGER NOT NULL REFERENCES people(id), official INTEGER NOT NULL CHECK(official IN (0, 1)), search_name TEXT)  DEFAULT CHARSET=utf8mb4"
             create_table_mysql(cnx, sql)
             dataCount = move_tables_data(conn, cnx, "personae", "(id, name, person_id, official, search_name)", False)
             print("personae rows {}".format(dataCount,))
 
-            sql = "CREATE TABLE awards (id INTEGER, type_id INTEGER NOT NULL, persona_id INTEGER NOT NULL, crown_id INTEGER, event_id INTEGER, date TEXT, scribe_id INTEGER, scroll_status_id INTEGER, scroll_updated TEXT, scroll_comment TEXT, provenance TEXT, PRIMARY KEY(id), FOREIGN KEY(type_id) REFERENCES award_types(id), FOREIGN KEY(event_id) REFERENCES events(id), FOREIGN KEY(scribe_id) REFERENCES scribes(id), FOREIGN KEY(crown_id) REFERENCES crowns(id), FOREIGN KEY(persona_id) REFERENCES personae(id), FOREIGN KEY(scroll_status_id) REFERENCES scroll_status(id))"
+            sql = "CREATE TABLE awards (id INTEGER, type_id INTEGER NOT NULL, persona_id INTEGER NOT NULL, crown_id INTEGER, event_id INTEGER, date TEXT, scribe_id INTEGER, scroll_status_id INTEGER, scroll_updated TEXT, scroll_comment TEXT, provenance TEXT, PRIMARY KEY(id), FOREIGN KEY(type_id) REFERENCES award_types(id), FOREIGN KEY(event_id) REFERENCES events(id), FOREIGN KEY(scribe_id) REFERENCES scribes(id), FOREIGN KEY(crown_id) REFERENCES crowns(id), FOREIGN KEY(persona_id) REFERENCES personae(id), FOREIGN KEY(scroll_status_id) REFERENCES scroll_status(id))  DEFAULT CHARSET=utf8mb4"
             create_table_mysql(cnx, sql)
             dataCount = move_tables_data(conn, cnx, "awards", "(id, type_id, persona_id, crown_id, event_id, date, scribe_id, scroll_status_id, scroll_updated, scroll_comment, provenance)", False)
             print("awards rows {}".format(dataCount,))
