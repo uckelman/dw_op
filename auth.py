@@ -40,7 +40,7 @@ def login_required(f):
     @functools.wraps(f)
     def decorated_function(*args, **kwargs):
         if 'username' not in session:
-            return redirect('https://op.drachenwald-sca.org/editor/login?next=' + request.url.replace('http','https'))
+            return redirect('https://op.drachenwald.sca.org/editor/login?next=' + request.url.replace('http','https'))
         return f(*args, **kwargs)
 
     return decorated_function
