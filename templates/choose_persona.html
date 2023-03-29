@@ -7,7 +7,7 @@
   <table>
     {% for g in matches %}
     <tr>
-      <td><a href="{{ url_for('persona', name=g[0]) }}">{{g[0]}}</a>{% if g[1:] %} (also known as {{ g[1:]|sort|unique(case_sensitive=True)|reject('eq',g[0])|join(', ') }}){% endif %}</td>
+       <td><a href="{{ url_for('persona', name=g[0]) }}">{{g[0]}}</a>{% if g[1:] %} (also known as {{ g[1:]|sort|unique(case_sensitive=True)|reject('eq',g[0])|join(', ') }}){% endif %}</td>
     </tr>
     {% endfor %}
   </table>
