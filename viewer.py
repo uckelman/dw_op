@@ -11,7 +11,9 @@ import sqlite3
 import textwrap
 import traceback
 import unicodedata
+import mysql.connector
 import base64
+
 from email.message import EmailMessage
 
 from google.oauth2 import service_account
@@ -40,14 +42,17 @@ app.config['USERS'] = { x[0]: User(*x) for x in app.config['USERS'] }
 
 
 def connect_db():
-    db = sqlite3.connect(app.config['DB_PATH'])
-#    db = sqlite3.connect(
-#        'file:/%s?mode=ro'.format(app.config['DB_PATH']), uri=True
-#    )
-    db.row_factory = sqlite3.Row
-    db.cursor().execute('PRAGMA foreign_keys=ON')
-    return db
+    try:
+        mysqluser = app.config['DB_USER']
+        mysqlpwd = app.config['DB_PWD']
+        mysqldb = app.config['DB_DATABASE']
+        dbhost = app.config['DB_HOST']
+    
+        db = mysql.connector.connect(user=mysqluser, password=mysqlpwd, host=dbhost, database=mysqldb, autocommit=True)
 
+        return db
+    except Exception as e:
+        raise ("error: %s - %s - %s" % (dbhost, database, e)) 
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -108,13 +113,13 @@ def persona(name):
     c = get_db().cursor()
     import urllib.parse
     uname = urllib.parse.unquote(name)
-    query_rst = do_query(c, 'SELECT people.id, people.surname IS NOT NULL OR people.forename IS NOT NULL, regions.name, people.blazon, people.emblazon FROM personae JOIN people ON personae.person_id = people.id JOIN regions ON people.region_id = regions.id WHERE personae.name = ?', uname)[0]
+    query_rst = do_query(c, 'SELECT people.id, people.surname IS NOT NULL OR people.forename IS NOT NULL, regions.name, people.blazon, people.emblazon FROM personae JOIN people ON personae.person_id = people.id JOIN regions ON people.region_id = regions.id WHERE personae.name = %s', uname)[0]
 
     person_id, has_modname, region, blazon, emblazon = query_rst 
 
-    official_id, official_name = do_query(c, 'SELECT id, name FROM personae WHERE person_id = ? AND official = 1', person_id)[0];
+    official_id, official_name = do_query(c, 'SELECT id, name FROM personae WHERE person_id = %s AND official = 1', person_id)[0];
 
-    other = do_query(c, 'SELECT name FROM personae WHERE person_id = ? AND id != ? ORDER BY name', person_id, official_id);
+    other = do_query(c, 'SELECT name FROM personae WHERE person_id = %s AND id != %s ORDER BY name', person_id, official_id);
     if other:
         other = [f[0] for f in other]
 
@@ -123,7 +128,7 @@ def persona(name):
     else:
         emblazon = '<div class="emblazon noarms"><div>I have not given<br/>Post Horn my<br/> registered<br/> arms.</div></div>'
 
-    awards = do_query(c, 'SELECT DISTINCT p2.name, award_types.name, awards.date, crowns.name, events.name FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id JOIN events ON awards.event_id = events.id LEFT OUTER JOIN crowns ON awards.crown_id = crowns.id WHERE p1.name = ? ORDER BY awards.date, award_types.name', uname)
+    awards = do_query(c, 'SELECT DISTINCT p2.name, award_types.name, awards.date, crowns.name, events.name FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id JOIN events ON awards.event_id = events.id LEFT OUTER JOIN crowns ON awards.crown_id = crowns.id WHERE p1.name = %s ORDER BY awards.date, award_types.name', uname)
 
     return render_template(
         'persona.html',
@@ -144,7 +149,7 @@ def persona(name):
 def person(surname, forename):
     c = get_db().cursor()
 
-    awards = do_query(c, 'SELECT award_types.name, awards.date, crowns.name, events.name FROM awards JOIN personae ON awards.persona_id = personae.id JOIN people ON personae.person_id = people.id JOIN award_types ON awards.type_id = award_types.id JOIN events ON awards.event_id = events.id LEFT OUTER JOIN crowns ON awards.crown_id = crowns.id WHERE people.surname = ? AND people.forename = ? ORDER BY awards.date, award_types.name', unquote(surname), unquote(forename))
+    awards = do_query(c, 'SELECT award_types.name, awards.date, crowns.name, events.name FROM awards JOIN personae ON awards.persona_id = personae.id JOIN people ON personae.person_id = people.id JOIN award_types ON awards.type_id = award_types.id JOIN events ON awards.event_id = events.id LEFT OUTER JOIN crowns ON awards.crown_id = crowns.id WHERE people.surname = %s AND people.forename = %s ORDER BY awards.date, award_types.name', unquote(surname), unquote(forename))
 
     return render_template(
         'person.html',
@@ -173,7 +178,7 @@ def awards():
 
     if request.method == 'POST':
         a_ids = [int(v) for v in request.form if v.isdigit()]
-        results = do_query(c, 'SELECT personae.name, award_types.name, awards.date, crowns.name, events.name FROM awards JOIN personae ON awards.persona_id = personae.id JOIN award_types ON awards.type_id = award_types.id JOIN events ON awards.event_id = events.id LEFT OUTER JOIN crowns ON awards.crown_id = crowns.id WHERE award_types.id IN ({}) ORDER BY awards.date, personae.name, award_types.name'.format(','.join(['?'] * len(a_ids))), *a_ids)
+        results = do_query(c, 'SELECT personae.name, award_types.name, awards.date, crowns.name, events.name FROM awards JOIN personae ON awards.persona_id = personae.id JOIN award_types ON awards.type_id = award_types.id JOIN events ON awards.event_id = events.id LEFT OUTER JOIN crowns ON awards.crown_id = crowns.id WHERE award_types.id IN ({}) ORDER BY awards.date, personae.name, award_types.name'.format(','.join(['%s'] * len(a_ids))), *a_ids)
 
     return render_template(
         'awards.html',
@@ -197,7 +202,7 @@ def date():
     results = None
 
     c = get_db().cursor()
-    results = do_query(c, 'SELECT personae.name, award_types.name, awards.date, crowns.name, events.name FROM personae JOIN awards ON personae.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id JOIN events ON awards.event_id = events.id LEFT OUTER JOIN crowns ON awards.crown_id = crowns.id WHERE date(?) <= date(awards.date) AND date(awards.date) <= date(?) ORDER BY awards.date, personae.name, award_types.name', begin, end)
+    results = do_query(c, 'SELECT personae.name, award_types.name, awards.date, crowns.name, events.name FROM personae JOIN awards ON personae.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id JOIN events ON awards.event_id = events.id LEFT OUTER JOIN crowns ON awards.crown_id = crowns.id WHERE date(%s) <= date(awards.date) AND date(awards.date) <= date(%s) ORDER BY awards.date, personae.name, award_types.name', begin, end)
 
     return render_template(
         'date.html',
@@ -213,7 +218,7 @@ def award():
     results = None
 
     c = get_db().cursor()
-    results = do_query(c, 'SELECT personae.name, award_types.name, awards.date, crowns.name, events.name FROM personae JOIN awards ON personae.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id JOIN events ON awards.event_id = events.id LEFT OUTER JOIN crowns ON awards.crown_id = crowns.id WHERE award_types.name LIKE ? ORDER BY awards.date, personae.name, award_types.name', '%{}%'.format(award))
+    results = do_query(c, 'SELECT personae.name, award_types.name, awards.date, crowns.name, events.name FROM personae JOIN awards ON personae.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id JOIN events ON awards.event_id = events.id LEFT OUTER JOIN crowns ON awards.crown_id = crowns.id WHERE award_types.name LIKE %s ORDER BY awards.date, personae.name, award_types.name', '%{}%'.format(award))
 
     return render_template(
         'award.html',
@@ -229,9 +234,9 @@ def crown():
 
     c = get_db().cursor()
 
-    crown = do_query(c, 'SELECT name FROM crowns WHERE id = ?', crown_id)[0][0]
+    crown = do_query(c, 'SELECT name FROM crowns WHERE id = %s', crown_id)[0][0]
 
-    results = do_query(c, 'SELECT personae.name, award_types.name, awards.date, crowns.name, events.name FROM personae JOIN awards ON personae.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id JOIN events ON awards.event_id = events.id JOIN crowns ON awards.crown_id = crowns.id WHERE crowns.id = ? ORDER BY awards.date, personae.name, award_types.name', crown_id)
+    results = do_query(c, 'SELECT personae.name, award_types.name, awards.date, crowns.name, events.name FROM personae JOIN awards ON personae.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id JOIN events ON awards.event_id = events.id JOIN crowns ON awards.crown_id = crowns.id WHERE crowns.id = %s ORDER BY awards.date, personae.name, award_types.name', crown_id)
 
     return render_template(
         'crown.html',
@@ -250,7 +255,7 @@ def op():
     if request.method == 'POST':
         min_precedence = int(request.form['precedence'].strip())
         c = get_db().cursor()
-        results = do_query(c, 'SELECT DISTINCT cur.name, awards.date, award_types.precedence FROM awards JOIN personae ON awards.persona_id = personae.id JOIN award_types ON awards.type_id = award_types.id LEFT JOIN (SELECT personae.person_id, award_types.precedence FROM awards JOIN personae ON awards.persona_id = personae.id JOIN award_types ON awards.type_id = award_types.id) AS pjoin ON personae.person_id = pjoin.person_id AND award_types.precedence < pjoin.precedence LEFT JOIN (SELECT personae.person_id, awards.date, award_types.precedence FROM awards JOIN personae ON awards.persona_id = personae.id JOIN award_types ON awards.type_id = award_types.id) AS djoin ON personae.person_id = djoin.person_id AND award_types.precedence = djoin.precedence AND awards.date > djoin.date JOIN personae AS cur ON personae.person_id = cur.person_id WHERE pjoin.precedence IS NULL AND djoin.date IS NULL AND award_types.precedence >= ? AND cur.official = 1 ORDER BY award_types.precedence DESC, awards.date, cur.name', min_precedence)
+        results = do_query(c, 'SELECT DISTINCT cur.name, awards.date, award_types.precedence FROM awards JOIN personae ON awards.persona_id = personae.id JOIN award_types ON awards.type_id = award_types.id LEFT JOIN (SELECT personae.person_id, award_types.precedence FROM awards JOIN personae ON awards.persona_id = personae.id JOIN award_types ON awards.type_id = award_types.id) AS pjoin ON personae.person_id = pjoin.person_id AND award_types.precedence < pjoin.precedence LEFT JOIN (SELECT personae.person_id, awards.date, award_types.precedence FROM awards JOIN personae ON awards.persona_id = personae.id JOIN award_types ON awards.type_id = award_types.id) AS djoin ON personae.person_id = djoin.person_id AND award_types.precedence = djoin.precedence AND awards.date > djoin.date JOIN personae AS cur ON personae.person_id = cur.person_id WHERE pjoin.precedence IS NULL AND djoin.date IS NULL AND award_types.precedence >= %s AND cur.official = 1 ORDER BY award_types.precedence DESC, awards.date, cur.name', min_precedence)
 
         headers = {
             1000: 'Duchy',
@@ -277,8 +282,8 @@ def op():
 @app.route('/reigns', methods=['GET'])
 def reigns():
     c = get_db().cursor()
-    principality = do_query(c, 'SELECT sov1 || " and " || sov2, begin, end FROM reigns WHERE date(begin) < date("1993-06-05") ORDER BY begin')
-    kingdom = do_query(c, 'SELECT sov1 || " and " || sov2, begin, end FROM reigns WHERE date(begin) >= date("1993-06-05") ORDER BY begin')
+    principality = do_query(c, "SELECT CONCAT(sov1, ' and ', sov2), begin, end FROM reigns WHERE date(begin) < date('1993-06-05') ORDER BY begin")
+    kingdom = do_query(c, "SELECT CONCAT(sov1, ' and ', sov2), begin, end FROM reigns WHERE date(begin) >= date('1993-06-05') ORDER BY begin")
 
     return render_template(
         'reigns.html',
@@ -324,13 +329,13 @@ def search_modern(c, surname, forename):
 
     if surname:
         if forename:
-            query += 'surname LIKE ? AND forename LIKE ?'
+            query += 'surname LIKE %s AND forename LIKE %s'
             params = ('%{}%'.format(surname), '%{}%'.format(forename))
         else:
-            query += 'surname LIKE ?'
+            query += 'surname LIKE %s'
             params = ('%{}%'.format(surname),)
     else:
-        query += 'forename LIKE ?'
+        query += 'forename LIKE %s'
         params = ('%{}%'.format(forename),)
 
     query += ' ORDER BY surname, forename'
@@ -369,8 +374,8 @@ def normalize(s):
 def match_persona(c, name):
     sname = normalize(name)
 
-    #rows = do_query(c, 'SELECT p2.id, p2.name, p1.person_id, p2.official FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id  WHERE p1.search_name LIKE ? AND p1.official = 1 ORDER BY p1.person_id, p2.official DESC, p2.name', '%{}%'.format(sname))
-    rows = do_query(c,'SELECT p2.id, p2.name, p1.person_id, p2.official FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id  WHERE p1.search_name LIKE ?  ORDER BY p1.person_id, p2.official DESC, p2.name', '%{}%'.format(sname))
+    #rows = do_query(c, 'SELECT p2.id, p2.name, p1.person_id, p2.official FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id  WHERE p1.search_name LIKE %s AND p1.official = 1 ORDER BY p1.person_id, p2.official DESC, p2.name', '%{}%'.format(sname))
+    rows = do_query(c,'SELECT p2.id, p2.name, p1.person_id, p2.official FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id  WHERE p1.search_name LIKE %s  ORDER BY p1.person_id, p2.official DESC, p2.name', '%{}%'.format(sname))
 
     results = [[i[1] for i in gi] for _, gi in itertools.groupby(rows, lambda r: r[2])]
     # sort name groups by their header name
@@ -467,7 +472,7 @@ def recommend():
 
             c = get_db().cursor()
 
-            rows = do_query(c, 'SELECT p2.id, p2.name, p1.person_id, p2.official FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id  WHERE p1.search_name LIKE ? AND p1.official = 1 ORDER BY p1.person_id, p2.official DESC, p2.name', '%{}%'.format(persona_search))
+            rows = do_query(c, 'SELECT p2.id, p2.name, p1.person_id, p2.official FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id  WHERE p1.search_name LIKE %s AND p1.official = 1 ORDER BY p1.person_id, p2.official DESC, p2.name', '%{}%'.format(persona_search))
 
             results = [[(i[0], i[1]) for i in gi] for _, gi in itertools.groupby(rows, lambda r: r[2])]
             results.sort(key=lambda x: (x[0][1].casefold(), x[0][1]))
@@ -483,12 +488,12 @@ def recommend():
                 data['persona'] = stripped(request.form, 'unknown')
                 data['awards'] = []
             else:
-                data['persona'] = do_query(c, 'SELECT name FROM personae WHERE id =  ?', persona_id)[0][0]
-                data['awards'] = do_query(c, 'SELECT award_types.name, awards.date, award_types.precedence FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id WHERE p1.id = ? ORDER BY awards.date, award_types.name', persona_id)
+                data['persona'] = do_query(c, 'SELECT name FROM personae WHERE id =  %s', persona_id)[0][0]
+                data['awards'] = do_query(c, 'SELECT award_types.name, awards.date, award_types.precedence FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id WHERE p1.id = %s ORDER BY awards.date, award_types.name', persona_id)
 
             data['in_op'] = persona_id is not None
 
-            data['unawards'] = do_query(c, 'SELECT award_types.id, award_types.name, CASE award_types.group_id WHEN 1 THEN 2 ELSE award_types.group_id END AS group_id, award_types.precedence FROM award_types LEFT JOIN (SELECT award_types.id FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id WHERE p1.id = ?) AS a ON award_types.id = a.id WHERE award_types.group_id IN (1, 2, 3, 4, 5, 25, 27, 30, 42) AND (award_types.open = 1 OR award_types.open IS NULL) AND award_types.id NOT IN (16, 27, 28, 29, 30, 49) AND a.id IS NULL ORDER BY group_id, award_types.precedence, award_types.name' , persona_id)
+            data['unawards'] = do_query(c, 'SELECT award_types.id, award_types.name, CASE award_types.group_id WHEN 1 THEN 2 ELSE award_types.group_id END AS group_id, award_types.precedence FROM award_types LEFT JOIN (SELECT award_types.id FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id WHERE p1.id = %s) AS a ON award_types.id = a.id WHERE award_types.group_id IN (1, 2, 3, 4, 5, 25, 27, 30, 42) AND (award_types.open = 1 OR award_types.open IS NULL) AND award_types.id NOT IN (16, 27, 28, 29, 30, 49) AND a.id IS NULL ORDER BY group_id, award_types.precedence, award_types.name' , persona_id)
 
             data['unawards'] = { g: list(gi) for g, gi in
                 itertools.groupby(data['unawards'], lambda x: x[2])
@@ -538,8 +543,8 @@ def recommend():
             scribe_email = stripped(request.form, 'scribe_email')
 
             c = get_db().cursor()
-            crown_names = [n[0] for n in do_query(c, 'SELECT name FROM groups WHERE id IN ({})'.format(','.join(['?'] * len(crowns))), *crowns)]
-            award_names = [n[0] for n in do_query(c, 'SELECT name FROM award_types WHERE id IN ({})'.format(','.join(['?'] * len(awards))), *awards)]
+            crown_names = [n[0] for n in do_query(c, 'SELECT name FROM groups WHERE id IN ({})'.format(','.join(['%s'] * len(crowns))), *crowns)]
+            award_names = [n[0] for n in do_query(c, 'SELECT name FROM award_types WHERE id IN ({})'.format(','.join(['%s'] * len(awards))), *awards)]
 
             data = {
                 'your_forename': your_forename,
@@ -736,7 +741,7 @@ def api_create_row(c, table, data):
 
 
 def api_read_row(c, table, id):
-    query = 'SELECT * FROM {} WHERE id = ?'.format(table)
+    query = 'SELECT * FROM {} WHERE id = %s'.format(table)
     c.execute(query, (id,))
     return json.dumps(c.fetchone(), cls=SQLite3RowEncoder)
 
@@ -755,7 +760,7 @@ def api_update_row(c, table, id, data):
 
 
 def api_delete_row(c, table, id):
-    query = 'DELETE FROM {} WHERE id = ?'.format(table)
+    query = 'DELETE FROM {} WHERE id = %s'.format(table)
     c.execute(query, (id,))
 
 
