@@ -92,7 +92,14 @@ def logout():
 
 @app.route('/')
 def front():
-    last_updated = datetime.date.fromtimestamp(os.path.getmtime(app.config['DB_PATH']))
+    last_updated = "unknown date"
+    c = get_db().cursor()
+    other = do_query(c, 'SELECT max(last_updated) FROM awards where last_updated is not Null ')
+    
+    if other:
+        dt = other[0][0]
+        last_updated = dt.strftime("%d %B %Y")
+
     return render_template(
         'front.html',
         last_updated=last_updated
