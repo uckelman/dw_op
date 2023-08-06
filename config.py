@@ -1,9 +1,9 @@
 import os.path
 
-DB_USER = 'wiifmqgdwop'
-DB_PWD = 'MC3SQtqfY526rmch'
-DB_DATABASE = 'wiifmqgdwop'
-DB_HOST ='wiifmqgdwop.mysql.db'
+DB_USER = 'op'
+DB_PWD = 'op'
+DB_DATABASE = 'drachdb'
+DB_HOST ='db'
 
 DISABLE_AUTH = False
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))

@@ -3,5 +3,9 @@
 {% block content %}
 <h1>Something went wrong!</h1>
 
+{% if config.ENV == 'development' %}
+<pre>{{ ex }}</pre>
+{% endif %}
+
 <p>Please report the problem to <a href="mail:webminister@drachenwald.sca.org">webminister@drachenwald.sca.org</a>, with a description of what you were doing.</p>
 {% endblock %}
