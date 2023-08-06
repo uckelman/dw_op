@@ -21,7 +21,6 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 from flask import Flask, flash, g, redirect, render_template, request, Response, url_for
-from flask_mail import Mail, Message
 
 from auth import User, handle_login, handle_logout, login_required
 from urllib.parse import unquote
