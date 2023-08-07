@@ -6,11 +6,13 @@
   <h1>Several names match your query test</h1>
   <table>
     {% for g in matches %}
+    	{% set alt_names = g[3] %}
     <tr>
-       <td><a href="{{ url_for('persona', name=g[0]) }}">{{g[0]}}</a>{% if g[1:] %} (also known as {{ g[1:]|sort|unique(case_sensitive=True)|reject('eq',g[0])|join(', ') }}){% endif %}</td>
+           <td><a href="{{ url_for('persona', name=g[1]) }}">{{g[1]}} {% if alt_names %} ({{ alt_names }}) {% endif %}</a></td>
     </tr>
     {% endfor %}
   </table>
+
   {% else %}
   <h1>No names match your query</h1>
   {% endif %}
