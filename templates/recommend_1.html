@@ -5,20 +5,39 @@
   <h1>Recommend Someone for an Award</h1>
 
   <form method="post">
+  
     <input type="hidden" name="state" value="1"/>
+  <p>
+    <ul style="list-style-type: none">
     {% if 'matches' in data %}
-    <table>
       {% for g in data['matches'] %}
-      <tr>
-        <td><input name="persona" type="radio" value="{{g[0][0]}}"/><label for="persona">{{g[0][1]}}{%if g[1:] %} (also known as {{ g[1:]|join(', ', attribute=1) }}){% endif %}</label></td>
-      </tr>
+		<li><input name="persona" type="radio" value="{{g[0]}}"/><label for="persona"> {{g[1]}} {%if g[3] %} (also known as {{ g[3] }}){% endif %}</label></li>
       {% endfor %}
-      <tr>
-        <td><input name="persona" type="radio" value=""/><input name="unknown" type="text" placeholder="Add SCA name here" size="50"/></td>
-      </tr>
-    </table>
     {% endif %}
-
+	<li> <input name="persona" type="radio" value=""/> Somebody not listed above: <input name="unknown" type="text" placeholder="Add SCA name here" size="50"/></td></li>
+	</ul>
+	</p>
+    {% if 'award_types' in data %}
+    
+    <p>
+    <h3>What kind of recommendation do you want to send?</h3>
+<ul style="list-style-type: none">
+      {% for g in data['award_types'] %}
+<li><input name="type" type="checkbox" value="{{g[0]}}"/><label for="type"> {{g[1]}}</label>
+      {% endfor %}
+   
+   </ul>{%endif%}
+   </p>
+   
+	    {% if 'branches' in data %}
+	
+	    <p>
+    <h3>Which crown do you want to send your recommendation to?</h3>
+<ul style="list-style-type: none">
+      {% for b in data['branches'] %}
+<li><input name="branch" type="checkbox" value="{{b[0]}}"/><label for="branch"> {{b[1]}}</label></li>
+      {% endfor %}
+	{%endif%}
     <button id="submit" type="submit" value="Select">Select</button>
   </form>
 
