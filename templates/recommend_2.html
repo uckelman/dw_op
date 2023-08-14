@@ -65,7 +65,7 @@
         {% for i in gi %}
           <tr>
             <td><input id="award_{{i[0]}}" name="awards[]" value="{{i[0]}}" type="checkbox"/></td>
-            <th><label for ="award_{{i[0]}}">{{i[1]}}</label></th>
+            <th><div class="hover-text"><label for ="award_{{i[0]}}">{{i[1]}}</label><span class="tooltip-text">{{i[4]}}</span></div></th>
           </tr>
         {% endfor %}
         </table>
