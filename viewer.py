@@ -148,6 +148,8 @@ def persona(name):
         emblazon=emblazon,
         awards=awards,
         persona_id=official_id
+        arms_path=filename='images/arms/' + emblazon
+
     )
 
 
