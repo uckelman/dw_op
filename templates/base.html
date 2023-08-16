@@ -75,7 +75,8 @@
 
     <div class="banner" style="background-image: url('{{ url_for('static', filename='images/default-banner.jpg') }}');">
       <div class="container"> 
-        <h1 class="display-5 pt-5 pb-5">{{ title_string }}</h1>
+        <h1 class="display-5 pt-5">{{ title_string }}</h1>
+        <h3 class="pb-5">{% block subtitle %}{% endblock %}</h3>
       </div>
     </div>
 

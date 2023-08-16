@@ -1,70 +1,61 @@
 {% extends "base.html" %}
-{% block head %}
-  {{ super() }}
-  {{ macros.tablesort_head() }}
-{% endblock %}
-{% block title %}Drachenwald OP - {{name}}{% endblock %}
+{% block title %}{{name}}{% endblock %}
+{% if region %}{% block subtitle %}Recently of {{ region }}{% endblock %}{% endif %}
 {% block content %}
 <div id="content">
   <div id="details">
-    {{emblazon|safe}}
 
-    <h1>{{name}}</h1>
+    <div class="row">
 
-    {% if other %}
-    <h2>also known as {{ ', '.join(other) }}</h2>
-    {% endif %}
+      <div class="col-12 col-sm-8 col-md-10">
 
-    {% if region %}
-    lately of {{region}}<br/>
-    {% endif %}
-    whose modern name is {% if not has_modname %}not{% endif %} on file</br>
-    {% if blazon %}
-    bearing arms of {{blazon}}
-    {% endif %}
+        <p>
+          {{ name }}, whose modern name is {% if not has_modname %}not{% endif %}
+          on file{% if other %}, also known as {{ ', '.join(other) }}{% endif %}.
+        </p>
 
-            <ul class="mhList">
-                <form method="post" action="https://op.drachenwald.sca.org/recommend">
-    <input type="hidden" name="state" value="1"/>
-                  <input name="persona" type="hidden" value="{{persona_id}}"/></td>
-            <button id="submit" type="submit" value="Select"> Recommend this person for an award </button>
-  </form>
+        <form method="post" action="https://op.drachenwald.sca.org/recommend">
+          <input type="hidden" name="state" value="1"/>
+          <input name="persona" type="hidden" value="{{persona_id}}"/></td>
+          <button class="btn btn-primary my-2 shadow" id="submit" type="submit" value="Select">Recommend this person for an award</button>
+          <a href="https://docs.google.com/forms/d/e/1FAIpQLSdtLQV7XY9ehFnc5T65Q5vPCFZMCB8hUc458JTw34rPRjdipw/viewform?usp=pp_url&entry.2122792637={{name}}&entry.1114613229=http://op.drachenwald.sca.org{{request.path}}"
+            class="btn btn-primary my-2 shadow">Send in a correction for {{name}}</a>
+        </form>
+    
+      </div>
 
-    <ol><a href="https://docs.google.com/forms/d/e/1FAIpQLSdtLQV7XY9ehFnc5T65Q5vPCFZMCB8hUc458JTw34rPRjdipw/viewform?usp=pp_url&entry.2122792637={{name}}&entry.1114613229=http://op.drachenwald.sca.org{{request.path}}">Send in a correction for {{name}}</a></ol>
-<!-- <ol><a href="https://docs.google.com/forms/d/e/1FAIpQLSfA9T0PWTzfRDju-Ewm7TU0_-PL7qnsWTtO6Dv8OikG7cg8Ww/viewform?entry.2004114986={{name}}&entry.200099466=http//op.drachenwald.sca.org{{request.path}}"> Send your modern name, pronouns and preferred title (only available at events with posthorn deputy)</a> </ol>-->
-              
-  </ul>
+      <div class="d-none d-sm-inline col-sm-4 col-md-2 text-center">
+        {% if arms_path %}
+          <figure class="figure">
+            <img src="{{ arms_path }}">
+            {% if blazon %}
+              <figcaption class="figure-caption text-center">
+                {{ blazon }}
+              </figcaption>
+            {% endif %}
+          </figure>
+        {% endif %}
+      </div>
+
+    </div>
   </div>
 
-  <div id="awards">
-    <table class="results">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Award</th>
-          <th data-sort-default>Date</th>
-          <th>Crown</th>
-          <th>Event</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for i in awards -%}
-        <tr>
-          <td>{{i[0]}}</td>
-          <td>{{i[1]}}</td>
-          <td>{{i[2]}}</td>
-          <td>{{i[3]}}</td>
-          <td>{{i[4]}}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <div class="row my-3">
+
+    <ul class="list-group col-12 col-md-8 col-lg-6 mx-auto">
+      {% for i in awards -%}
+        <li class="list-group-item p-3 shadow">
+          <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">{{i[1]}}</h5>
+            {{i[2]}}
+          </div>
+            Awarded by {{i[3]}} at {{i[4]}}<br />
+            <span class="text-body-secondary">under the name <strong>{{i[0]}}</strong></span>
+        </li>
+      {% endfor %}
+    </ul>
+
   </div>
 
-  <script>
-    for (let t of document.getElementsByClassName('results')) {
-      new Tablesort(t);
-    }
-  </script>
 </div>
 {% endblock %}
