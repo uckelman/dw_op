@@ -2,40 +2,37 @@
 {% block title %}Reigns{% endblock %}
 {% block content %}
 <div id="content">
-  <h1>Reigns</h1>
-
   <div id="awards">
-    <table class="results">
-      <thead>
-        <tr>
-          <th>Crowns</th>
-          <th>Start</th>
-          <th>End</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <th>Princes and Princesses of Drachenwald</th>
-        </tr>
+    <div class="d-lg-flex m-2 text-center">
+      <ul class="list-group m-2 w-100">
+
+        <li class="list-group-item list-group-item-primary">
+          <h3>Princes and Princesses of Drachenwald</h3>
+        </li>
+
         {% for i in principality -%}
-        <tr>
-          {% for j in i -%}
-          <td>{{j}}</td>
-          {% endfor %}
-        </tr>
+        <li class="list-group-item">
+          {{ i[0] }}<br />
+          <small class="text-body-secondary">From {{ i[1] }} to {{ i[2] }}</small>
+        </li>
         {% endfor %}
-        <tr>
-          <th>Kings and Queens of Drachenwald</th>
-        </tr>
+      </ul>
+
+      <br />
+
+      <ul class="list-group m-2 w-100">
+        <li class="list-group-item list-group-item-primary">
+          <h3>Kings and Queens of Drachenwald</h3>
+        </li>
         {% for i in kingdom -%}
-        <tr>
-          {% for j in i -%}
-          <td>{{j}}</td>
-          {% endfor %}
-        </tr>
+        <li class="list-group-item">
+          {{ i[0] }}<br />
+          <small class="text-body-secondary">From {{ i[1] }} {% if i[2] %}to {{ i[2] }}{% endif %}</small>
+        </li>
         {% endfor %}
-      </tbody>
-    </table>
+
+      </ul>
+    </div>
   </div>
 </div>
 {% endblock %}
