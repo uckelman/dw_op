@@ -402,7 +402,7 @@ from personae p
 			where  p1.official =1 
 			group by p1.id 	) as p_full
 			on p.person_id = p_full.person_id
-WHERE id =%s """, name)
+WHERE id =%s order by p_full.name""", name)
     else:
         print("regular name")
         return do_query(cursor,"""select distinct p_full.id, p_full.name, p_full.person_id, substring(alt_names,1,length(alt_names)-1) as alt_names 
@@ -413,7 +413,7 @@ from personae p
 			where  p1.official =1 
 			group by p1.id 	) as p_full
 			on p.person_id = p_full.person_id
-WHERE p.name like %s  or p.search_name like %s """, '%{}%'.format(name), '%{}%'.format(name))
+WHERE p.name like %s  or p.search_name like %s order by p_full.name""", '%{}%'.format(name), '%{}%'.format(name))
 
 def search_persona(c, persona):
     #matches = match_persona(c, persona)
