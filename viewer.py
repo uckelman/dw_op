@@ -132,9 +132,7 @@ def persona(name):
         other = [f[0] for f in other]
 
     if emblazon:
-        emblazon = '<img class="emblazon" src="{}"/>'.format(url_for('static', filename='images/arms/' + emblazon))
-    else:
-        emblazon = '<div class="emblazon noarms"><div>I have not given<br/>Post Horn my<br/> registered<br/> arms.</div></div>'
+        emblazon = url_for('static', filename='images/arms/' + emblazon)
 
     awards = do_query(c, 'SELECT DISTINCT p2.name, award_types.name, awards.date, crowns.name, events.name FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id JOIN events ON awards.event_id = events.id LEFT OUTER JOIN crowns ON awards.crown_id = crowns.id WHERE p1.name = %s ORDER BY awards.date, award_types.name', uname)
 
@@ -147,8 +145,8 @@ def persona(name):
         blazon=blazon,
         emblazon=emblazon,
         awards=awards,
-        persona_id=official_id
-        arms_path=filename='images/arms/' + emblazon
+        persona_id=official_id,
+        arms_path=emblazon
 
     )
 
