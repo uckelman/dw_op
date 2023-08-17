@@ -12,18 +12,16 @@
 
         <div class="input-group mt-3 mb-5 shadow">
           <input id="persona" name="persona" type="text" class="form-control" placeholder="Search SCA name...">
-          <button class="btn btn-primary" id="submit" type="submit" value="Search">Quick search</button>
+          <button class="btn btn-primary px-5" id="submit" type="submit" value="Search">Quick search</button>
         </div>
 
       </form>
-
 
       <div class="text-center w-100">
         <div class="d-grid gap-2 col-10 col-lg-8 mx-auto mb-5 shadow">
           <a class="btn btn-primary shadow" href="{{ url_for('search') }}">Advanced Search</a>
         </div>
       </div>
-
 
       <p>Last updated {{last_updated}}.</p>
 
