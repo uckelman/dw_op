@@ -34,21 +34,24 @@
 
   <div class="row my-3">
 
-    <ul class="list-group col-12 col-md-8 col-lg-6 mx-auto">
+    <div class="accordion col-12 col-md-10 col-lg-8 col-xl-6 mx-auto" id="awardlist">
       {% for i in awards -%}
-        <li class="list-group-item p-3 shadow">
-          <div class="d-flex w-100 justify-content-between">
-            <h5 class="mb-1">{{i[1]}}</h5>
-            {{i[2]}}
+        <div class="accordion-item">
+          <div class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{i[1] | urlencode}}-{{i[2] | urlencode}}" aria-expanded="false" aria-controls="collapse-{{i[1] | urlencode}}-{{i[2] | urlencode}}">
+              <div class="d-flex w-100 justify-content-between">
+                <h5>{{i[1]}}</h5>
+                <span class="text-muted me-3">{{i[2]}}</span>
+              </div>
+            </button>
           </div>
-          <div class="d-flex w-100 justify-content-between">
-            <span>at {{i[4]}}</span>
-            <span>Awarded by {{i[3]}}</span>
+          <div id="collapse-{{i[1] | urlencode}}-{{i[2] | urlencode}}" class="accordion-collapse collapse p-3" data-bs-parent="#awardlist">
+            Awarded at <strong>{{i[4]}}</strong> by <strong>{{i[3]}}</strong><br />
+            under the name <strong>{{i[0]}}</strong>
           </div>
-          <span class="text-body-secondary">under the name <strong>{{i[0]}}</strong></span>
-        </li>
+        </div>
       {% endfor %}
-    </ul>
+    </div>
 
   </div>
 
