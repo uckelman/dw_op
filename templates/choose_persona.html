@@ -8,7 +8,7 @@
   <div id="awards" class="mb-3">
     <div class="list-group col-12 col-md-8 col-lg-6 mx-auto shadow">
 
-      {% for g in matches %}
+      {% for g in matches | sort(attribute='1') %}
     	  {% set alt_names = g[3] %}
 
         <a href="{{ url_for('persona', name=g[1]) }}" class="list-group-item list-group-item-action">

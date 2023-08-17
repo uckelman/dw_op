@@ -43,7 +43,7 @@
           <h3>{{headers[prec]}}</h3>
         </div>
 
-        {% for r in group %}
+        {% for r in group | sort(attribute='1') %}
 
           <a href="{{ url_for('persona', name=r[0]) }}" class="list-group-item list-group-item-action">
             <div class="d-flex w-100 justify-content-between">
