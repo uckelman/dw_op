@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {%- import "macros.html" as macros %}
 {% block title %}{{name}}{% endblock %}
-{% if region %}{% block subtitle %}Recently of {{ region }}{% endblock %}{% endif %}
 {% block content %}
 <div id="content">
   <div id="details">
@@ -12,8 +11,12 @@
 
         <p>
           {{ name }}, whose modern name is {% if not has_modname %}not{% endif %}
-          on file{% if other %}, also known as {{ ', '.join(other) }}{% endif %}.
+          on file{% if other %}, is also known as {{ ', '.join(other) }}{% endif %}.
         </p>
+
+        {% if region %}
+          <p>Lately of {{ region }}</p>
+        {% endif %}
 
         <form method="post" action="https://op.drachenwald.sca.org/recommend">
           <input type="hidden" name="state" value="1"/>
