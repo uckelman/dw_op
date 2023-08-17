@@ -1,50 +1,39 @@
 {% extends "base.html" %}
-{% block head %}
-  {{ super() }}
-  {{ macros.tablesort_head() }}
-{% endblock %}
-{% block title %}Drachenwald OP - {{forename}} {{surname}}{% endblock %}
+{% block title %}{{forename}} {{surname}}{% endblock %}
 {% block content %}
 <div id="content">
   <div id="details">
-    <h1>{{forename}}{{ ' ' if forename and surname}}{{surname}}</h1>
-        <ul class="mhList">
-    <ol>Recommend this person for an award</ol>
-
-    <ol><a href="https://docs.google.com/forms/d/e/1FAIpQLSdtLQV7XY9ehFnc5T65Q5vPCFZMCB8hUc458JTw34rPRjdipw/viewform?usp=pp_url&entry.2122792637={{forename}}+{{surname}}&entry.1114613229=http://op.drachenwald.sca.org{{request.path}}">Submit a correction for {{forename}} {{surname}}</a></ol>
-  </ul>
+    <div class="row">
+      <div class="col-12 text-center">
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSdtLQV7XY9ehFnc5T65Q5vPCFZMCB8hUc458JTw34rPRjdipw/viewform?usp=pp_url&entry.2122792637={{forename}}+{{surname}}&entry.1114613229=http://op.drachenwald.sca.org{{request.path}}"
+            class="btn btn-primary mb-4 shadow">Send in a correction for {{forename}} {{surname}}</a>
+      </div>
+    </div>
   </div>
+
+
+
   <div id="awards">
     {% if awards %}
-    <table class="results">
-      <thead>
-        <tr>
-          <th>Award</th>
-          <th data-sort-default>Date</th>
-          <th>Crown</th>
-          <th>Event</th>
-        </tr>
-      </thead>
-      <tbody>
-        </tr>
+      <div class="accordion col-12 col-md-10 col-lg-8 col-xl-6 mx-auto" id="awardlist">
         {% for i in awards -%}
-        <tr>
-          {% for j in i %}
-          <td>{{j}}</td>
-          {% endfor -%}
-        </tr>
-        {% endfor -%}
-      </tbody>
-    </table>
+          <div class="accordion-item">
+            <div class="accordion-header">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{i[1] | urlencode}}-{{i[2] | urlencode}}" aria-expanded="false" aria-controls="collapse-{{i[1] | urlencode}}-{{i[2] | urlencode}}">
+                <div class="d-flex w-100 justify-content-between">
+                  <h5>{{i[0]}}</h5>
+                  <span class="text-muted me-3">{{i[1]}}</span>
+                </div>
+              </button>
+            </div>
+            <div id="collapse-{{i[1] | urlencode}}-{{i[2] | urlencode}}" class="accordion-collapse collapse p-3" data-bs-parent="#awardlist">
+              Awarded at <strong>{{i[3]}}</strong> by <strong>{{i[2]}}</strong><br />
+            </div>
+          </div>
+        {% endfor %}
+      </div>
     {% endif %}
-  </div>
-
 </div>
 
-<script>
-  for (let t of document.getElementsByClassName('results')) {
-    new Tablesort(t);
-  }
-</script>
 {% endblock %}
 
