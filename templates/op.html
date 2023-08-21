@@ -2,32 +2,15 @@
 {% block title %}Order of Precedence{% endblock %}
 {% block content %}
 <div id="content">
-  {% if results %}
-  <div id="awards">
-    <table class="op">
-      {% for prec, group in results -%}
-      <tbody>
-        <tr>
-          <th colspan="2">{{headers[prec]}}</th>
-        </tr>
-        {% for r in group %}
-        <tr>
-          <td><a href="{{ url_for('persona', name=r[0]) }}">{{r[0]}}</a></td>
-          <td>{{r[1]}}</td>
-        </tr>
-        {% endfor -%}
-      </tbody>
-      {% endfor -%}
-    </table>
-  </div>
-  {% endif %}
 
   <form method="post">
-    <table>
-      <tr>
-        <td>
-          <select name="precedence">
-            <option value="1000">Duchy</option>
+
+    <div class="text-center w-100">
+      <div class="mb-3 d-grid col-12 col-md-8 col-lg-6 mx-auto">
+        <div class="input-group shadow">
+          <span class="input-group-text">Show those with</span>
+          <select name="precedence" class="form-select">
+            <option value="1000" selected>Duchy</option>
             <option value="900">County</option>
             <option value="800">Viscounty</option>
             <option value="700">Bestowed peerages</option>
@@ -37,15 +20,45 @@
             <option value="300">Award of Arms awards</option>
             <option value="200">Award of Arms</option>
             <option value="100">All awards</option>
-          </select> and above
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <button type="submit" value="Search">Search</button>
-        </td>
-      </tr>
-    </table>
+          </select>
+          <span class="input-group-text">and above</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center w-100">
+      <div class="d-grid gap-2 col-10 col-sm-8 col-md-6 col-lg-4 mx-auto mb-5">
+        <button class="btn btn-primary shadow" type="submit">Show the OP</button>
+      </div>
+    </div>
+
   </form>
+
+  {% if results %}
+  <div id="awards" class="mb-3">
+    <div class="list-group col-12 col-md-8 col-lg-6 mx-auto shadow">
+      {% for prec, group in results -%}
+
+        <div class="list-group-item text-bg-primary">
+          <h3>{{headers[prec]}}</h3>
+        </div>
+
+        {% for r in group | sort(attribute='1') %}
+
+          <a href="{{ url_for('persona', name=r[0]) }}" class="list-group-item list-group-item-action">
+            <div class="d-flex w-100 justify-content-between">
+              <span>{{ r[0] }}</span>
+              <small class="text-body-secondary">{{ r[1] }}</small>
+            </div>
+          </a>
+
+        {% endfor -%}
+
+      {% endfor -%}
+    </div>
+  </div>
+  {% endif %}
+
+
 </div>
 {% endblock %}
