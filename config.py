@@ -2,8 +2,8 @@ import os.path
 
 DB_USER = 'op'
 DB_PWD = 'op'
-DB_DATABASE = 'drachdb'
-DB_HOST ='db'
+DB_DATABASE = 'drachdb2'
+DB_HOST ='127.0.0.1'
 
 DISABLE_AUTH = False
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -29,3 +29,6 @@ USERS = (
         'signet@drachenwald.sca.org'
     )
 )
+ARMORIAL_PATH="./arms"
+GOOGLE_KEY_ID = ""
+GOOGLE_KEY_SECRET = ""
