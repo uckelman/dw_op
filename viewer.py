@@ -703,20 +703,8 @@ Date | Recommender's Real Name | Recommender's SCA Name | Recommender's Email Ad
 
             to = [a for c in crowns for a in crown_emails[c]]
 
-            GOOGLE_KEY_ID = app.config['GOOGLE_KEY_ID']
-            GOOGLE_KEY_SECRET = app.config['GOOGLE_KEY_SECRET']
             scopes = ['https://www.googleapis.com/auth/gmail.send', 'https://www.googleapis.com/auth/gmail.compose']
-            cred_info = {"type": "service_account",
-                        "project_id": "dw-order-of-precedence",
-                         "private_key_id": GOOGLE_KEY_ID,
-                         "private_key": GOOGLE_KEY_SECRET,
-                         "client_email": "artificial-deputy-for-the-orde@dw-order-of-precedence.iam.gserviceaccount.com",
-                         "client_id": "111021806773359996540",
-                         "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-                         "token_uri": "https://oauth2.googleapis.com/token",
-                         "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-                         "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/artificial-deputy-for-the-orde%40dw-order-of-precedence.iam.gserviceaccount.com"
-            }
+            cred_info = app.config['GOOGLE_CRED']
             
             credentials = service_account.Credentials.from_service_account_info(info=cred_info, scopes=scopes)
              

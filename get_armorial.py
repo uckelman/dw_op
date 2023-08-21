@@ -27,17 +27,8 @@ def get_gdrive_service():
 
 
 SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly', 'https://www.googleapis.com/auth/drive.file','https://www.googleapis.com/auth/drive']
-cred_info = {"type": "service_account",
-                        "project_id": "dw-order-of-precedence",
-                         "private_key_id": config.GOOGLE_KEY_ID,
-                         "private_key": config.GOOGLE_KEY_SECRET,
-                         "client_email": "artificial-deputy-for-the-orde@dw-order-of-precedence.iam.gserviceaccount.com",
-                         "client_id": "111021806773359996540",
-                         "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-                         "token_uri": "https://oauth2.googleapis.com/token",
-                         "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-                         "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/artificial-deputy-for-the-orde%40dw-order-of-precedence.iam.gserviceaccount.com"
-}
+
+cred_info = config.GOOGLE_CRED
 
 credentials = service_account.Credentials.from_service_account_info(info=cred_info, scopes=SCOPES)
 service = build('drive', 'v3', credentials=credentials)
@@ -68,7 +59,7 @@ for item in items:
         while done is False:
             status, done = downloader.next_chunk()
         # Write the stuff
-        with open("%s/%s" %(config.ARMORIAL_PATH,item['name'].strip(), "wb") as f:
+        with open("%s/%s" %(config.ARMORIAL_PATH,item['name'].strip()), "wb") as f:
             f.write(file.getbuffer())
             #print(file.getvalue())
 
