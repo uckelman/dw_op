@@ -125,6 +125,16 @@
           {% endfor %}
         </div>
 
+        <div class="border rounded p-3 my-3 shadow">
+          <h3>Gotvik awards</h3>
+          {% for i in awards_ep %}
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" name="{{i[0]}}" id="a-{{i[0]}}">
+              <label class="form-check-label" for="a-{{i[0]}}">{{i[1]}}</label>
+            </div>
+          {% endfor %}
+        </div>
+
       </div>
     </div>
 
