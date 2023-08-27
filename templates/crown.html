@@ -17,7 +17,7 @@
         </tr>
       </thead>
       <tbody>
-        {% for i in results -%}
+        {% for i in results | reverse -%}
         <tr>
           <td><a href="{{ url_for('persona', name=i[0]) }}">{{i[0]}}</a></td>
           <td>{{i[1]}}</td>

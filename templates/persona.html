@@ -2,6 +2,8 @@
 {%- import "macros.html" as macros %}
 {% block title %}{{name}}{% endblock %}
 {% block content %}
+{% set sortedawards = awards | sort(attribute='2') | sort(attribute='5') %}
+{% set highestaward = sortedawards | first %}
 <div id="content">
   <div id="details">
 
@@ -10,18 +12,32 @@
       <div class="col-12 col-sm-8 col-md-10 text-center text-sm-start">
 
         <p>
-          {{ name }}, whose modern name is {% if not has_modname %}not{% endif %}
-          on file{% if other %}, is also known as {{ ', '.join(other) }}{% endif %}.
+          <b>{{ name }}</b>, whose modern name is {% if not has_modname %}not{% endif %}
+          on file.
         </p>
 
+        {% if other %}
+        <p>
+          Also known as {{ ', '.join(other) }}
+        </p>
+        {% endif %}
+
         {% if region %}
-          <p>Lately of {{ region }}</p>
+          <p>Most recently of <b>{{ region }}</b>.</p>
+        {% endif %}
+
+        {% if sortedawards %}
+          <p>
+            Highest award received is
+            <b>{{ highestaward[1] }}</b>
+            from <b>{{ highestaward[3] }}</b>.
+          </p>
         {% endif %}
 
         <form method="post" action="https://op.drachenwald.sca.org/recommend">
           <input type="hidden" name="state" value="1"/>
           <input name="persona" type="hidden" value="{{persona_id}}"/></td>
-          <button class="btn btn-primary my-2 shadow" id="submit" type="submit" value="Select">Recommend this person for an award</button>
+          <button class="btn btn-primary my-2 me-2 shadow" id="submit" type="submit" value="Select">Recommend this person for an award</button>
           <a href="https://docs.google.com/forms/d/e/1FAIpQLSdtLQV7XY9ehFnc5T65Q5vPCFZMCB8hUc458JTw34rPRjdipw/viewform?usp=pp_url&entry.2122792637={{name}}&entry.1114613229=http://op.drachenwald.sca.org{{request.path}}"
             class="btn btn-primary my-2 shadow">Send in a correction for {{name}}</a>
         </form>
@@ -37,15 +53,15 @@
 
   <div class="row my-3">
 
-    <div class="accordion col-12 col-md-10 col-lg-8 col-xl-6 mx-auto" id="awardlist">
-      {% for i in awards -%}
+    <div class="accordion col-12 col-md-10 col-lg-10 mx-auto" id="awardlist">
+      {% for i in sortedawards -%}
         <div class="accordion-item">
           <div class="accordion-header">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{i[1] | urlencode}}-{{i[2] | urlencode}}" aria-expanded="false" aria-controls="collapse-{{i[1] | urlencode}}-{{i[2] | urlencode}}">
-              <div class="d-flex w-100 justify-content-between">
-                <h5>{{i[1]}}</h5>
-                <span class="text-muted me-3">{{i[2]}}</span>
-              </div>
+              <div class="col-8 col-md-6 col-xl-4"><h5>{{i[1]}}</h5></div>
+              <div class="d-none d-xl-inline col-xl-3 text-end text-muted">{{i[1]}}</div>
+              <div class="d-none d-md-inline col-md-3 col-xl-3 text-end">{{i[3]}}</div>
+              <div class="col-4 col-md-3 col-xl-2 text-start ps-3">{{i[2]}}</div>
             </button>
           </div>
           <div id="collapse-{{i[1] | urlencode}}-{{i[2] | urlencode}}" class="accordion-collapse collapse p-3" data-bs-parent="#awardlist">
