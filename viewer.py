@@ -135,6 +135,7 @@ def persona(name):
         emblazon = url_for('static', filename='images/arms/' + emblazon)
 
     awards = do_query(c, 'SELECT DISTINCT p2.name, award_types.name, awards.date, crowns.name, events.name, award_types.precedence FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id JOIN events ON awards.event_id = events.id LEFT OUTER JOIN crowns ON awards.crown_id = crowns.id WHERE p1.name = %s ORDER BY awards.date, award_types.name', uname)
+    highest= do_query(c, 'SELECT DISTINCT p2.name, award_types.name, awards.date, crowns.name, events.name, award_types.precedence FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id JOIN events ON awards.event_id = events.id LEFT OUTER JOIN crowns ON awards.crown_id = crowns.id WHERE p1.name = %s ORDER BY award_types.precedence desc, awards.date Limit 1', uname)
 
     return render_template(
         'persona.html',
@@ -147,6 +148,7 @@ def persona(name):
         awards=awards,
         persona_id=official_id,
         arms_path=emblazon
+        highest=highest
 
     )
 
