@@ -2,8 +2,7 @@
 {%- import "macros.html" as macros %}
 {% block title %}{{name}}{% endblock %}
 {% block content %}
-{% set sortedawards = awards | sort(attribute='2') | sort(attribute='5') %}
-{% set highestaward = sortedawards | first %}
+{% set sortedawards = awards | sort(attribute='2') | sort(reverse=true,attribute='5') %}
 <div id="content">
   <div id="details">
 
@@ -27,6 +26,7 @@
         {% endif %}
 
         {% if sortedawards %}
+          {% set highestaward = sortedawards | first %}
           <p>
             Highest award received is
             <b>{{ highestaward[1] }}</b>
@@ -54,7 +54,7 @@
   <div class="row my-3">
 
     <div class="accordion col-12 col-md-10 col-lg-10 mx-auto" id="awardlist">
-      {% for i in sortedawards -%}
+      {% for i in awards -%}
         <div class="accordion-item">
           <div class="accordion-header">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{i[1] | urlencode}}-{{i[2] | urlencode}}" aria-expanded="false" aria-controls="collapse-{{i[1] | urlencode}}-{{i[2] | urlencode}}">
