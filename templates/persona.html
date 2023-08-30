@@ -2,7 +2,6 @@
 {%- import "macros.html" as macros %}
 {% block title %}{{name}}{% endblock %}
 {% block content %}
-{% set sortedawards = awards | sort(attribute='2') | sort(reverse=true,attribute='5') %}
 <div id="content">
   <div id="details">
 
@@ -25,12 +24,11 @@
           <p>Most recently of <b>{{ region }}</b>.</p>
         {% endif %}
 
-        {% if sortedawards %}
-          {% set highestaward = sortedawards | first %}
+        {% if highest %}
           <p>
             Highest award received is
-            <b>{{ highestaward[1] }}</b>
-            from <b>{{ highestaward[3] }}</b>.
+            <b>{{ highest[0][1] }}</b>
+            from <b>{{ highest[0][3] }}</b>.
           </p>
         {% endif %}
 
