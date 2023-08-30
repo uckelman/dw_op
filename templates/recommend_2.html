@@ -2,7 +2,6 @@
 {% block title %}Award Recommendation{% endblock %}
 {% block content %}
 <div id="content">
-  <h1>Recommend Someone for an Award</h1>
 
   <form id="recform" method="post">
     <input type="hidden" name="state" value="2"/>
@@ -12,15 +11,20 @@
     <h2>{{data['persona']}}</h2>
 
     {% if data['awards'] %}
-    possessed already of these awards
-    <table>
-      {% for i in data['awards'] %}
-      <tr>
-        <td>{{i[0]}}</td>
-        <td>{{i[1]}}</td>
-      </tr>
-      {% endfor %}
-    </table>
+    <strong>possessed already of these awards</strong>
+
+    <div class="my-3">
+      <ul class="list-group col-12 col-md-8 col-lg-6" id="awardlist">
+        {% for i in data['awards'] %}
+          <li class="list-group-item d-flex justify-content-between align-items-start">
+            <span>{{i[0]}}</span>
+            <span class="text-muted">{{i[1]}}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+
     {% elif not data['in_op'] %}
     <h2>This person is not already in the Order of Precedence.</h2>
     <table>
@@ -56,40 +60,46 @@
     </table>
     {% endif %}
 
-    <h2>For which awards do you recommend this person?</h2>
-    <div class="awardslist_box">
-    {% for g, gi in data['unawards'].items() %}
-      <div>
-        <h3>{{data['sendto'][g]}}</h3>
-        <table>
+    <div class="my-3"><strong>For which awards do you recommend this person?</strong></div>
+    <ul class="list-group col-12 col-md-8 col-lg-6">
+      {% for g, gi in data['unawards'].items() %}
+        <li class="list-group-item list-group-item-primary text-bg-primary">
+          <strong>{{data['sendto'][g]}}</strong>
+        </li>
+
         {% for i in gi %}
-          <tr>
-            <td><input id="award_{{i[0]}}" name="awards[]" value="{{i[0]}}" type="checkbox"/></td>
-            <th><div class="hover-text"><label for ="award_{{i[0]}}">{{i[1]}}</label><span class="tooltip-text">{{i[4]}}</span></div></th>
-          </tr>
+          <label class="form-check-label" for="award_{{i[0]}}">
+            <li class="list-group-item">
+              <input class="form-check-input me-1" id="award_{{i[0]}}" name="awards[]" value="{{i[0]}}" type="checkbox">
+              <div class="hover-text">{{i[1]}}<span class="tooltip-text">{{i[4]}}</span></div>
+            </li>
+          </label>
         {% endfor %}
-        </table>
-      </div>
-    {% endfor %}
-    </div>
 
-    <h2>Why?</h2>
-    <textarea id="recommendation" name="recommendation" rows="10" cols="80" placeholder="Why do they deserve this award? More information makes it easier for royals to grant awards" required></textarea>
-
-    <h2>Which Crowns should receive your recommendation?</h2>
-    <table>
-      {% for k, v in data['sendto'].items() %}
-      <tr>
-        <td><input id="crown_{{k}}" name="crowns[]" value="{{k}}" type="checkbox"/></td>
-        <th><label for ="crown_{{k}}">{{v}}</label></th>
-      </tr>
       {% endfor %}
-    </table>
+    </ul>
 
-    <h2>Which events might the recommendee attend?</h2>
-    <textarea id="events" name="events" rows="4" cols="80" placeholder="E.g., Michaelmas, Twelfth Night"></textarea>
+    <div class="my-3"><strong>Why?</strong></div>
+    <textarea class="form-control" id="recommendation" name="recommendation"  style="height: 100px" placeholder="Why do they deserve this award? More information makes it easier for royals to grant awards" required></textarea>
 
-    <h2>Who, if anyone, do you suggest as a scribe?</h2>
+    <div class="my-3"><strong>Which Crowns should receive your recommendation?</strong></div>
+
+    <ul class="list-group col-12 col-md-8 col-lg-6">
+      {% for k, v in data['sendto'].items() %}
+        <label class="form-check-label" for="crown_{{k}}">
+          <li class="list-group-item">
+            <input class="form-check-input me-1" id="crown_{{k}}" name="crowns[]" value="{{k}}" type="checkbox">
+            {{ v }}
+          </li>
+        </label>
+      {% endfor %}
+
+    </ul>
+
+    <div class="my-3"><strong>Which events might the recommendee attend?</strong></div>
+    <textarea class="form-control" id="events" name="events" style="height: 100px" placeholder="E.g., Michaelmas, Twelfth Night" required></textarea>
+
+    <div class="my-3"><strong>Who, if anyone, do you suggest as a scribe?</strong></div>
     <table>
       <tr>
         <th><label for="scribe">Name</label></th>
