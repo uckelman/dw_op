@@ -24,40 +24,30 @@
       </ul>
     </div>
 
-
     {% elif not data['in_op'] %}
-    <h2>This person is not already in the Order of Precedence.</h2>
-    <table>
-      <tr>
-        <th>
-          <label for="time_served">How long has this person been in the society?</label>
-        </th>
-        <td>
-          <input id="time_served" name="time_served" type="text"/>
-        </td>
-      </tr>
-      <tr>
-        <th>
-          <label for="gender">Gender</label>
-        </th>
-        <td>
-          <select id="gender" name="gender">
-            <option value=""></option>
-            <option value="female">female</option>
-            <option value="male">male</option>
-            <option value="other">other</option>
-          </select>
-        </td>
-      </tr>
-      <tr>
-        <th>
-          <label for="branch">Home shire, group, or region</label>
-        </th>
-        <td>
-          <input id="branch" name="branch" type="text"/>
-        </td>
-      </tr>
-    </table>
+
+    <p>This person is not already in the Order of Precedence.</p>
+
+    <div class="mb-3 col-12 col-md-8 col-lg-6">
+      <label for="time_served"><strong>How long has this person been in the society?</strong></label>
+      <input id="time_served" name="time_served" type="text" class="form-control">
+    </div>
+
+    <div class="mb-3 col-12 col-md-8 col-lg-6">
+      <label for="gender"><strong>Gender</strong></label>
+      <select id="gender" name="gender" class="form-select">
+        <option value=""></option>
+        <option value="female">female</option>
+        <option value="male">male</option>
+        <option value="other">other</option>
+      </select>
+    </div>
+
+    <div class="mb-3 col-12 col-md-8 col-lg-6">
+      <label for="branch"><strong>Home shire, group, or region</strong></label>
+      <input id="branch" name="branch" type="text" class="form-control">
+    </div>
+
     {% endif %}
 
     <div class="my-3"><strong>For which awards do you recommend this person?</strong></div>
@@ -69,9 +59,9 @@
 
         {% for i in gi %}
           <label class="form-check-label" for="award_{{i[0]}}">
-            <li class="list-group-item">
+            <li class="list-group-item" {% if i[4] != None %}data-bs-toggle="tooltip" data-bs-title="{{i[4]}}"{% endif %}>
               <input class="form-check-input me-1" id="award_{{i[0]}}" name="awards[]" value="{{i[0]}}" type="checkbox">
-              <div class="hover-text">{{i[1]}}<span class="tooltip-text">{{i[4]}}</span></div>
+              {{i[1]}}
             </li>
           </label>
         {% endfor %}
@@ -103,7 +93,7 @@
 
     <div>
       <label for="scribe">
-        <div class="input-group mb-3">
+        <div class="input-group mb-3 col-12 col-md-8 col-lg-6">
           <span class="input-group-text">Name</span>
           <input class="form-control" id="scribe" name="scribe" type="text">
         </div>
@@ -207,6 +197,11 @@ form.addEventListener("reset", function(event) {
 form.addEventListener("submit", function(event) {
   c.forEach(x => x.disabled = false);
 }, false);
+</script>
+
+<script>
+  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+  const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 </script>
 
 {% endblock %}
