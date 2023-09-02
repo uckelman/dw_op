@@ -542,10 +542,8 @@ def recommend():
             else:
                 data['persona'] = do_query(c, 'SELECT name FROM personae WHERE id =  %s', persona_id)[0][0]
                 data['awards'] = do_query(c, 'SELECT award_types.name, awards.date, award_types.precedence FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id  WHERE p1.id = %s ORDER BY awards.date, award_types.name', persona_id)
-										
-            data['in_op'] = persona_id is not None
-
-            unawards_query = '''SELECT award_types.id, award_types.name, CASE award_types.group_id WHEN 1 THEN 2 ELSE award_types.group_id END AS group_id, award_types.precedence,tooltip  
+            
+                unawards_query = '''SELECT award_types.id, award_types.name, CASE award_types.group_id WHEN 1 THEN 2 ELSE award_types.group_id END AS group_id, award_types.precedence,tooltip  
                                 FROM award_types 
                                     LEFT JOIN (SELECT award_types.id 
                                                FROM personae AS p1 
@@ -559,10 +557,12 @@ def recommend():
                                       AND (a.id IS NULL  or repeatable = 1) -- don't recommend awards that the person already have unless they can be handed out multiple times
                         		ORDER BY group_id, award_types.precedence, award_types.name''' % (persona_id, ','.join(data['branch']), '","'.join(data['award_types']))
 
-            data['unawards'] = do_query(c, unawards_query)
-            data['unawards'] = { g: list(gi) for g, gi in
-                itertools.groupby(data['unawards'], lambda x: x[2])
-            }
+                data['unawards'] = do_query(c, unawards_query)
+                data['unawards'] = { g: list(gi) for g, gi in
+                    itertools.groupby(data['unawards'], lambda x: x[2])
+                }
+            
+            data['in_op'] = persona_id is not None
             #print(data['unawards'])
 
             # removes the awards of similar level if already received
