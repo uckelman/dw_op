@@ -100,37 +100,52 @@
     <textarea class="form-control" id="events" name="events" style="height: 100px" placeholder="E.g., Michaelmas, Twelfth Night" required></textarea>
 
     <div class="my-3"><strong>Who, if anyone, do you suggest as a scribe?</strong></div>
-    <table>
-      <tr>
-        <th><label for="scribe">Name</label></th>
-        <td><input id="scribe" name="scribe" type="text" maxlength="80"/></td>
-      </tr>
-      <tr>
-        <th><label for="scribe_email">Email</label></th>
-        <td><input id="scribe_email" name="scribe_email" type="email" maxlength="80"/></td>
-      </tr>
-    </table>
 
-    <h2>Who are you?</h2>
-    <table>
-      <tr>
-        <th><label for="your_forename">First</label></th>
-        <td><input name="your_forename" type="text" maxlength="80" required/></td>
-        <th><label for="your_surname">Last</label></th>
-        <td><input name="your_surname" type="text" maxlength="80" required/></td>
-      </tr>
-      <tr>
-        <th><label for="your_persona">Persona</label></th>
-        <td><input name="your_persona" type="text" maxlength="80" required/></td>
-      </tr>
-      <tr>
-        <th><label for="your_email">Email</label></th>
-        <td><input name="your_email" type="email" maxlength="80" required/></td>
-      </tr>
-    </table>
+    <div>
+      <label for="scribe">
+        <div class="input-group mb-3">
+          <span class="input-group-text">Name</span>
+          <input class="form-control" id="scribe" name="scribe" type="text">
+        </div>
+      </label>
+    </div>
 
-    <button id="submit" type="submit" value="Submit">Submit</button>
-    <button id="reset" type="reset" value="Reset">Reset</button>
+    <div>
+      <label for="scribe_email">
+        <div class="input-group mb-3">
+          <span class="input-group-text">Email</span>
+          <input class="form-control" id="scribe_email" name="scribe_email" type="email">
+        </div>
+      </label>
+    </div>
+      
+    <div class="my-3"><strong>Who are you?</strong></div>
+
+    <div class="input-group mb-3">
+      <span class="input-group-text">First<span class="d-none d-sm-inline">&nbsp;name</span></span>
+      <input class="form-control" name="your_forename" type="text" required>
+      <span class="input-group-text">Last<span class="d-none d-sm-inline">&nbsp;name</span></span>
+      <input class="form-control" name="your_surname" type="text" required>
+    </div>
+
+    <div class="input-group mb-3">
+      <span class="input-group-text">SCA name</span>
+      <input class="form-control" name="your_persona" type="text" required>
+    </div>
+
+    <div class="input-group mb-3">
+      <span class="input-group-text">Your email</span>
+      <input class="form-control" name="your_email" type="email" required>
+    </div>
+
+    <div class="text-center w-100 my-4">
+      <div class="d-grid gap-2 col-10 col-sm-8 col-md-6 col-lg-4 mx-auto mb-5">
+        <button class="btn btn-primary mb-4" id="submit" type="submit" value="Submit">Send recommendation</button>
+        <button class="btn btn-secondary mb-4" id="reset" type="reset" value="Reset">Reset form</button>
+      </div>
+    </div>
+
+
   </form>
 </div>
 
