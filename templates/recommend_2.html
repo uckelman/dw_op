@@ -69,9 +69,9 @@
 
         {% for i in gi %}
           <label class="form-check-label" for="award_{{i[0]}}">
-            <li class="list-group-item">
+            <li class="list-group-item" {% if i[4] != None %}data-bs-toggle="tooltip" data-bs-title="{{i[4]}}"{% endif %}>
               <input class="form-check-input me-1" id="award_{{i[0]}}" name="awards[]" value="{{i[0]}}" type="checkbox">
-              <div class="hover-text">{{i[1]}}<span class="tooltip-text">{{i[4]}}</span></div>
+              {{i[1]}}
             </li>
           </label>
         {% endfor %}
@@ -207,6 +207,11 @@ form.addEventListener("reset", function(event) {
 form.addEventListener("submit", function(event) {
   c.forEach(x => x.disabled = false);
 }, false);
+</script>
+
+<script>
+  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+  const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 </script>
 
 {% endblock %}
