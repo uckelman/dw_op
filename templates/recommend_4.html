@@ -1,7 +1,14 @@
 {% extends "base.html" %}
 {% block title %}Award Recommendation{% endblock %}
 {% block content %}
-<div id="content">
-  <h1>Recommendation sent!</h1>
-</div>
+  <div id="content">
+    <div class="text-center w-100">
+      <p><strong>Your recommendation has been sent.</strong></p>
+      <div class="text-center w-100">
+        <div class="col-12 col-md-10 col-lg-8 mx-auto">
+          <a class="btn btn-primary shadow" href="{{ url_for('front') }}">Go to home page</a>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}

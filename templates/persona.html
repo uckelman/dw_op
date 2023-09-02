@@ -2,8 +2,6 @@
 {%- import "macros.html" as macros %}
 {% block title %}{{name}}{% endblock %}
 {% block content %}
-{% set sortedawards = awards | sort(attribute='2') | sort(attribute='5') %}
-{% set highestaward = sortedawards | first %}
 <div id="content">
   <div id="details">
 
@@ -26,11 +24,11 @@
           <p>Most recently of <b>{{ region }}</b>.</p>
         {% endif %}
 
-        {% if sortedawards %}
+        {% if highest %}
           <p>
             Highest award received is
-            <b>{{ highestaward[1] }}</b>
-            from <b>{{ highestaward[3] }}</b>.
+            <b>{{ highest[0][1] }}</b>
+            from <b>{{ highest[0][3] }}</b>.
           </p>
         {% endif %}
 
@@ -45,23 +43,41 @@
       </div>
 
       <div class="d-none d-sm-inline col-sm-4 col-md-2 text-center">
-        {{ macros.heraldryimg() }}
+        {% if arms_path %}
+          <figure class="figure">
+            <img src="{{ arms_path }}">
+            {% if blazon %}
+              <figcaption class="figure-caption text-center">
+                {{ blazon }}
+              </figcaption>
+            {% endif %}
+          </figure>
+          {% else %}
+          <figure class="figure">
+            <img src="{{ url_for('static', filename='images/arms/noarms.png') }}">
+            <figcaption class="figure-caption text-center">
+              Posthorn does not have heraldry on file
+            </figcaption>
+          </figure>
+        {% endif %}
       </div>
 
     </div>
   </div>
 
-  <div class="row my-3">
+  <div class="my-3">
 
     <div class="accordion col-12 col-md-10 col-lg-10 mx-auto" id="awardlist">
-      {% for i in sortedawards -%}
+      {% for i in awards -%}
         <div class="accordion-item">
           <div class="accordion-header">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{i[1] | urlencode}}-{{i[2] | urlencode}}" aria-expanded="false" aria-controls="collapse-{{i[1] | urlencode}}-{{i[2] | urlencode}}">
-              <div class="col-8 col-md-6 col-xl-4"><h5>{{i[1]}}</h5></div>
-              <div class="d-none d-xl-inline col-xl-3 text-end text-muted">{{i[4]}}</div>
-              <div class="d-none d-md-inline col-md-3 col-xl-3 text-end">{{i[3]}}</div>
-              <div class="col-4 col-md-3 col-xl-2 text-start ps-3">{{i[2]}}</div>
+              <div class="row w-100">
+                <div class="col-8 col-lg-6 col-xl-4"><h5>{{i[1]}}</h5></div>
+                <div class="d-none d-xl-inline col-xl-3 text-end text-muted">{{i[4]}}</div>
+                <div class="d-none d-lg-inline col-lg-3 col-xl-3 text-end">{{i[3]}}</div>
+                <div class="col-4 col-lg-3 col-xl-2 text-start ps-3">{{i[2]}}</div>
+              </div>
             </button>
           </div>
           <div id="collapse-{{i[1] | urlencode}}-{{i[2] | urlencode}}" class="accordion-collapse collapse p-3" data-bs-parent="#awardlist">
@@ -76,7 +92,23 @@
 
   <div class="row mt-5">
     <div class="d-inline d-sm-none col-12 text-center">
-      {{ macros.heraldryimg() }}
+      {% if arms_path %}
+        <figure class="figure">
+          <img src="{{ arms_path }}">
+          {% if blazon %}
+            <figcaption class="figure-caption text-center">
+              {{ blazon }}
+            </figcaption>
+          {% endif %}
+        </figure>
+        {% else %}
+        <figure class="figure">
+          <img src="{{ url_for('static', filename='images/arms/noarms.png') }}">
+          <figcaption class="figure-caption text-center">
+            Posthorn does not have heraldry on file
+          </figcaption>
+        </figure>
+      {% endif %}
     </div>
   </div>
 

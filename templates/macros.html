@@ -27,23 +27,3 @@
     </ul>
   </div>
 {%- endmacro %}
-
-{% macro heraldryimg() -%}
-  {% if arms_path %}
-  <figure class="figure">
-    <img src="{{ arms_path }}">
-    {% if blazon %}
-      <figcaption class="figure-caption text-center">
-        {{ blazon }}
-      </figcaption>
-    {% endif %}
-  </figure>
-  {% else %}
-  <figure class="figure">
-    <img src="{{ url_for('static', filename='images/arms/noarms.png') }}">
-    <figcaption class="figure-caption text-center">
-      Posthorn does not have heraldry on file
-    </figcaption>
-  </figure>
-  {% endif %}
-{% endmacro %}
