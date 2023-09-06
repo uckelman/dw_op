@@ -3,32 +3,31 @@
 {% block content %}
 <div id="content">
   {% if results %}
-  <h1>Awards Bestowed by {{crown}}</h1>
+  
+    <h2>Awards Bestowed by {{crown}}</h2>
 
-  <div id="awards">
-    <table class="results">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Award</th>
-          <th>Date</th>
-          <th>Crown</th>
-          <th>Event</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for i in results | reverse -%}
-        <tr>
-          <td><a href="{{ url_for('persona', name=i[0]) }}">{{i[0]}}</a></td>
-          <td>{{i[1]}}</td>
-          <td>{{i[2]}}</td>
-          <td>{{i[3]}}</td>
-          <td>{{i[4]}}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+    <ul class="list-group">
+
+      {% for i in results | reverse -%}
+
+      <a class="list-group-item list-group-item-action" href="{{ url_for('persona', name=i[0]) }}">
+        <div class="row w-100">
+          <div class="col-4 col-lg-3 col-xl-3">{{i[0]}}</div>
+          <div class="col-5 col-lg-4 col-xl-3 text-start ps-3">{{i[1]}}</div>
+          <div class="col-3 col-lg-2 col-xl-2 text-start ps-3">{{i[2]}}</div>
+          <div class="d-none d-lg-inline col-lg-3 col-xl-2 text-end">{{i[3]}}</div>
+          <div class="d-none d-xl-inline col-xl-2 text-end text-muted">{{i[4]}}</div>
+        </div>
+        <div class="row d-xl-none">
+          <div class="col-6 d-lg-none text-muted"><small>Awarded by {{i[3]}}</small></div>
+          <div class="col-6 col-lg-12 d-xl-none text-end text-lg-start text-muted"><small>{{i[4]}}</small></div>
+        </div>
+      </a>
+
+      {% endfor %}
+
+    </ul>
+
   {% endif %}
 </div>
 {% endblock %}
