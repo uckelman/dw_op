@@ -21,7 +21,6 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 from flask import Flask, flash, g, redirect, render_template, request, Response, url_for
-from flask_mail import Mail, Message
 
 from auth import User, handle_login, handle_logout, login_required
 from urllib.parse import unquote
@@ -69,6 +68,8 @@ def close_db(exception):
 
 
 def do_query(cursor, query, *params):
+    print(query)
+    print(params)
     cursor.execute(query, params)
     return [tuple(r) for r in cursor.fetchall()]
 
@@ -131,11 +132,10 @@ def persona(name):
         other = [f[0] for f in other]
 
     if emblazon:
-        emblazon = '<img class="emblazon" src="{}"/>'.format(url_for('static', filename='images/arms/' + emblazon))
-    else:
-        emblazon = '<div class="emblazon noarms"><div>I have not given<br/>Post Horn my<br/> registered<br/> arms.</div></div>'
+        emblazon = url_for('static', filename='images/arms/' + emblazon)
 
-    awards = do_query(c, 'SELECT DISTINCT p2.name, award_types.name, awards.date, crowns.name, events.name FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id JOIN events ON awards.event_id = events.id LEFT OUTER JOIN crowns ON awards.crown_id = crowns.id WHERE p1.name = %s ORDER BY awards.date, award_types.name', uname)
+    awards = do_query(c, 'SELECT DISTINCT p2.name, award_types.name, awards.date, crowns.name, events.name, award_types.precedence FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id JOIN events ON awards.event_id = events.id LEFT OUTER JOIN crowns ON awards.crown_id = crowns.id WHERE p1.name = %s ORDER BY awards.date, award_types.name', uname)
+    highest= do_query(c, 'SELECT DISTINCT p2.name, award_types.name, awards.date, crowns.name, events.name, award_types.precedence FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id JOIN events ON awards.event_id = events.id LEFT OUTER JOIN crowns ON awards.crown_id = crowns.id WHERE p1.name = %s ORDER BY award_types.precedence desc, awards.date Limit 1', uname)
 
     return render_template(
         'persona.html',
@@ -146,7 +146,10 @@ def persona(name):
         blazon=blazon,
         emblazon=emblazon,
         awards=awards,
-        persona_id=official_id
+        persona_id=official_id,
+        arms_path=emblazon,
+        highest=highest
+
     )
 
 
@@ -157,12 +160,14 @@ def person(surname, forename):
     c = get_db().cursor()
 
     awards = do_query(c, 'SELECT award_types.name, awards.date, crowns.name, events.name FROM awards JOIN personae ON awards.persona_id = personae.id JOIN people ON personae.person_id = people.id JOIN award_types ON awards.type_id = award_types.id JOIN events ON awards.event_id = events.id LEFT OUTER JOIN crowns ON awards.crown_id = crowns.id WHERE people.surname = %s AND people.forename = %s ORDER BY awards.date, award_types.name', unquote(surname), unquote(forename))
+    highest = do_query(c, 'SELECT award_types.name, awards.date, crowns.name, events.name FROM awards JOIN personae ON awards.persona_id = personae.id JOIN people ON personae.person_id = people.id JOIN award_types ON awards.type_id = award_types.id JOIN events ON awards.event_id = events.id LEFT OUTER JOIN crowns ON awards.crown_id = crowns.id WHERE people.surname = %s AND people.forename = %s ORDER BY award_types.precedence desc, awards.date Limit 1', unquote(surname), unquote(forename))
 
     return render_template(
         'person.html',
         surname=unquote(surname),
         forename=unquote(forename),
-        awards=awards
+        awards=awards,
+        highest=highest
     )
 
 
@@ -390,15 +395,37 @@ def match_persona(c, name):
 
     return results
 
+def db_search_persona(cursor, name):
+    if(name.isnumeric()):
+        print("name is numeric")
+        return do_query(cursor,"""select distinct p_full.id, p_full.name, p_full.person_id,substring(alt_names,1,length(alt_names)-1) as  alt_names 
+from personae p 
+	left join (select p1.person_id, p1.id,  group_concat(p2.name, ',') as alt_names, p1.name
+			from personae as p1
+					left join personae as p2 on p1.person_id = p2.person_id and p2.official = 0
+			where  p1.official =1 
+			group by p1.id 	) as p_full
+			on p.person_id = p_full.person_id
+WHERE id =%s order by p_full.name""", name)
+    else:
+        print("regular name")
+        return do_query(cursor,"""select distinct p_full.id, p_full.name, p_full.person_id, substring(alt_names,1,length(alt_names)-1) as alt_names 
+from personae p 
+	left join (select p1.person_id, p1.id,  group_concat(p2.name, ',') as alt_names, p1.name
+			from personae as p1
+					left join personae as p2 on p1.person_id = p2.person_id and p2.official = 0
+			where  p1.official =1 
+			group by p1.id 	) as p_full
+			on p.person_id = p_full.person_id
+WHERE p.name like %s  or p.search_name like %s order by p_full.name""", '%{}%'.format(name), '%{}%'.format(name))
 
 def search_persona(c, persona):
-    matches = match_persona(c, persona)
-
+    #matches = match_persona(c, persona)
+    matches = db_search_persona(c, persona)
     if len(matches) == 1:
-        return redirect(url_for('persona', name=matches[0][0]))
+        return redirect(url_for('persona', name=matches[0][1]))
     else:
         return render_template('choose_persona.html', matches=matches)
-
 
 def throw_if(*args):
     if any(args):
@@ -423,12 +450,14 @@ def search():
         end = stripped(request.form, 'end')
         crown = stripped(request.form, 'crown')
         award = stripped(request.form, 'award')
+        print("search")
 
         try:
             if forename or surname:
                 throw_if(persona, begin, end, crown, award)
                 return search_modern(get_db().cursor(), surname, forename)
             elif persona:
+                print("go search for persona")
                 throw_if(forename, surname, begin, end, crown, award)
                 return search_persona(get_db().cursor(), persona)
             elif begin or end:
@@ -467,67 +496,93 @@ REC_CSV_TRANS = str.maketrans({
 
 @app.route('/recommend', methods=['GET', 'POST'])
 def recommend():
+  c = get_db().cursor()
+  data = {}
+  state = 0
 
-    data = {}
-    state = 0
-
+ 
+  try:
+    award_types = do_query(c, "select id, category from award_categories")
+    data['award_types']=award_types
+    branches = do_query(c, 'select distinct id,name from groups where accept_recommendations = 1')
+    data['branches'] = branches
     if request.method == 'POST':
         state = request.form.get('state', default=0, type=int)
 
-        if state == 0:
+        if state == 0 or state == 6:
+           # first page of the form. Check if the person recommended already exists in the database
             persona_search = normalize(stripped(request.form, 'persona_search'))
-
             c = get_db().cursor()
+            if state == 6:
+                data['direct']=True
+                persona_search = normalize(stripped(request.form, 'persona'))
 
-            rows = do_query(c, 'SELECT p2.id, p2.name, p1.person_id, p2.official FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id  WHERE p1.search_name LIKE %s AND p1.official = 1 ORDER BY p1.person_id, p2.official DESC, p2.name', '%{}%'.format(persona_search))
-
-            results = [[(i[0], i[1]) for i in gi] for _, gi in itertools.groupby(rows, lambda r: r[2])]
-            results.sort(key=lambda x: (x[0][1].casefold(), x[0][1]))
-
-            data['matches'] = results
+            rst=db_search_persona(c,persona_search)
+            data['matches'] = rst
+            data['award_types'] = award_types
+            data['branches'] = branches
             state = 1
-
         elif state == 1:
+           #2nd page of the form: confirm the person in the db (or ask for name). Get type or recommendation and crown         
             c = get_db().cursor()
-
             data['persona_id'] = persona_id = request.form.get('persona', type=int)
+            data['award_types'] = request.form.getlist('type')
+            data['branch'] = request.form.getlist('branch')            
+            print(data['branch'])
+            if '2' in data['branch']:
+                    print("Adding SCA awards")
+                    addSCA = data['branch']
+                    addSCA.append('1')  #add SCA level awards if Drachenwald is selected
+                    data['branch'] = addSCA
+                    
+            print(data['branch'])
             if persona_id is None:
                 data['persona'] = stripped(request.form, 'unknown')
                 data['awards'] = []
+                data['unawards']={}
+                persona_id = -1
+            
             else:
                 data['persona'] = do_query(c, 'SELECT name FROM personae WHERE id =  %s', persona_id)[0][0]
-                data['awards'] = do_query(c, 'SELECT award_types.name, awards.date, award_types.precedence FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id WHERE p1.id = %s ORDER BY awards.date, award_types.name', persona_id)
+                data['awards'] = do_query(c, 'SELECT award_types.name, awards.date, award_types.precedence FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id  WHERE p1.id = %s ORDER BY awards.date, award_types.name', persona_id)
+            print("persona_id: %s" %persona_id)
+            unawards_query = '''SELECT award_types.id, award_types.name, CASE award_types.group_id WHEN 1 THEN 2 ELSE award_types.group_id END AS group_id, award_types.precedence,tooltip  
+                                FROM award_types 
+                                    LEFT JOIN (SELECT award_types.id 
+                                               FROM personae AS p1 
+                                                    JOIN personae AS p2 ON p1.person_id = p2.person_id 
+                                                    JOIN awards ON p2.id = awards.persona_id 
+                                                    JOIN award_types ON awards.type_id = award_types.id WHERE p1.id = %s) AS a ON award_types.id = a.id 
+                                WHERE (award_types.group_id IN (%s) 
+                                      AND (award_types.open = 1 OR award_types.open IS NULL) 
+                                      and recommendable = 1
+                                      and award_types.category_id in ("%s") or (award_types.id = 1))  
+                                      AND (a.id IS NULL  or repeatable = 1) -- don't recommend awards that the person already have unless they can be handed out multiple times
+                        		ORDER BY group_id, award_types.precedence, award_types.name''' % (persona_id, ','.join(data['branch']), '","'.join(data['award_types']))
 
-            data['in_op'] = persona_id is not None
-
-            data['unawards'] = do_query(c, 'SELECT award_types.id, award_types.name, CASE award_types.group_id WHEN 1 THEN 2 ELSE award_types.group_id END AS group_id, award_types.precedence FROM award_types LEFT JOIN (SELECT award_types.id FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id WHERE p1.id = %s) AS a ON award_types.id = a.id WHERE award_types.group_id IN (1, 2, 3, 4, 5, 25, 27, 30, 42) AND (award_types.open = 1 OR award_types.open IS NULL) AND award_types.id NOT IN (16, 27, 28, 29, 30, 49) AND a.id IS NULL ORDER BY group_id, award_types.precedence, award_types.name' , persona_id)
-
+            data['unawards'] = do_query(c, unawards_query)
             data['unawards'] = { g: list(gi) for g, gi in
-                itertools.groupby(data['unawards'], lambda x: x[2])
-            }
+                    itertools.groupby(data['unawards'], lambda x: x[2])
+                }
+            
+            data['in_op'] = persona_id == -1
+            #print(data['unawards'])
 
-            if 2 in data['unawards']:
-                # omit AoA if they have any AoA-level awards
-                # omit GoA if they have any GoA-level awards
-                has_aoa = any(a[2] == 300 for a in data['awards'])
-                has_goa = any(a[2] == 500 for a in data['awards'])
-                data['unawards'][2] = [u for u in data['unawards'][2] if (not has_aoa or u[0] != 1) and (not has_goa or u[0] != 11)]
+            # removes the awards of similar level if already received
+            #if 2 in data['unawards']:
+            #    # omit AoA if they have any AoA-level awards
+            #    # omit GoA if they have any GoA-level awards
+            #    has_aoa = any(a[2] == 300 for a in data['awards'])
+            #    has_goa = any(a[2] == 500 for a in data['awards'])
+            #    data['unawards'][2] = [u for u in data['unawards'][2] if (not has_aoa or u[0] != 1) and (not has_goa or u[0] != 11)]
 
-#            data['sendto'] = [r[0] for r in do_query(c, 'SELECT name FROM groups WHERE id IN (2, 3, 4, 5, 25, 27, 30)')]
-            data['sendto'] = {
-                2: 'Drachenwald',
-                27: 'Insulae Draconis',
-                3: 'Nordmark',
-                4: 'Aarnimetsä',
-                30: 'Gotvik',
-                5: 'Knight\'s Crossing',
-                25: 'Styringheim',
-                42: 'Eplaheimr'
-            }
+            crowns = dict(do_query(c, 'SELECT id, name FROM groups WHERE id != 1 and id in (%s)' % ','.join(data['branch'])))
+            data['sendto']=crowns
+
             state = 2
-
+ 
         elif state == 2:
-
+            #process form details 
             your_forename = stripped(request.form, 'your_forename')
             your_surname = stripped(request.form, 'your_surname')
             your_persona = stripped(request.form, 'your_persona')
@@ -573,9 +628,6 @@ def recommend():
                 'scribe_email': scribe_email
             }
 
-            state = 3
-
-        elif state == 3:
             your_email = stripped(request.form, 'your_email')
 
             rec = stripped(request.form, 'recommendation')
@@ -658,60 +710,42 @@ Date | Recommender's Real Name | Recommender's SCA Name | Recommender's Email Ad
 
             to = [a for c in crowns for a in crown_emails[c]]
 
-            msg = Message(
-                'Recommendation',
-                sender='noreply@op.drachenwald.sca.org',
-                recipients=to,
-                cc=[your_email],
-                body=body
-            )
-
-            #mail.send(msg)
-            try:
-                scopes = ['https://www.googleapis.com/auth/gmail.send', 'https://www.googleapis.com/auth/gmail.compose']
-                cred_info = {"type": "service_account",
-                             "project_id": "dw-order-of-precedence",
-                             "private_key_id": GOOGLE_KEY_ID,
-                             "private_key": GOOGLE_KEY_SECRET,
-                             "client_email": "artificial-deputy-for-the-orde@dw-order-of-precedence.iam.gserviceaccount.com",
-                             "client_id": "111021806773359996540",
-                             "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-                             "token_uri": "https://oauth2.googleapis.com/token",
-                             "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-                             "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/artificial-deputy-for-the-orde%40dw-order-of-precedence.iam.gserviceaccount.com"
+            scopes = ['https://www.googleapis.com/auth/gmail.send', 'https://www.googleapis.com/auth/gmail.compose']
+            cred_info = app.config['GOOGLE_CRED']
+            
+            credentials = service_account.Credentials.from_service_account_info(info=cred_info, scopes=scopes)
+             
+            service = build('gmail', 'v1', credentials=credentials.with_subject('recommendations@drachenwald.sca.org'))
+            message = EmailMessage()
+            print(message) 
+            message.set_content(body)
+            #TODO: restore this to original
+            #message['To'] = to
+            message['To'] = [your_email]
+            message['Cc'] = [your_email]
+            message['From']= cred_info["client_email"]
+            message['Subject'] = 'Recommendation'
+            
+            encoded_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
+            create_message = {
+                        'raw': encoded_message
                 }
+            # pylint: disable=E1101
             
-                
-                credentials = service_account.Credentials.from_service_account_info(info=cred_info, scopes=scopes)
-            
-                service = build('gmail', 'v1', credentials=credentials.with_subject('recommendations@drachenwald.sca.org'))
-                message = EmailMessage()
-            
-                message.set_content(body)
-                message['To'] = to
-                message['Cc'] = [your_email]
-                message['From']= cred_info["client_email"]
-                message['Subject'] = 'Recommendation'
-            
-                encoded_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
-                create_message = {
-                            'raw': encoded_message
-                    }
-                # pylint: disable=E1101
-                
-                send_message = (service.users().messages().send
+            send_message = (service.users().messages().send
                                 (userId="me", body=create_message).execute())
-            except HttpError as error:
-                print('An error occurred: {error} please let the webminister know by sending an email to webminister@drachenwald.sca.org')
-                send_message = None    
-    
+
             state = 4
 
     return render_template(
         'recommend_{}.html'.format(state),
         data=data
     )
-
+  except Exception as e:
+      data["error"]=e.traceback.format_exc()
+      return render_template('recommend_fail.html',data=data)
+  data["hier"]="========================="
+  return render_template('recommend_fail.html',data=data)
 
 #
 # JSON API

@@ -1,50 +1,171 @@
-{% import "macros.html" as macros %}
-<!doctype html>
-<html lang="en-US">
-<head>
-{% block head %}
-  <meta charset="utf-8">
-  <title>{% block title %}{% endblock %}</title>
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/site.css') }}"/>
-{% endblock %}
-</head>
-<body>
-  {% block flash %}
-  {% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-  <div class="flashes">
-  {% for category, message in messages %}
-    {% if category == 'error' %}
-    <div class="error"><strong>Error:</strong> {{ message }}</div>
-    {% else %}
-    <div class="{{ category }}">{{ message }}</div>
-    {% endif %}
-  {% endfor %}
-  </div>
-  {% endif %}
-  {% endwith %}
-  {% endblock %}
-  {% block header %}
-  <header>
-    <img class="dwarms_l" src="{{ url_for('static', filename='images/arms/dwarms.png') }}"/><div class="hslug">
-      <nav id="head_nav">
-        {{ macros.navlist() }}
-      </nav>
-      <div id="opbar">Drachenwald Order of Precedence</div>
-    </div><img class="dwarms_r" src="{{ url_for('static', filename='images/arms/dwarms.png') }}"/>
-  </header>
-  {% endblock %}
-  {% block content %}{% endblock %}
-  {% block footer %}
-  <footer>
-    <nav id="foot_nav">
-      {{ macros.navlist() }}
-    </nav>
+{%- import "macros.html" as macros %}
+{%- set title_string %}{% block title %}{% endblock %}{% endset %}
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+  {% block head %}
+    <title>{{title_string}}</title>
+    <meta charset="utf-8" />
+    <meta property="og:image" content="{{ url_for('static', filename='images/default-banner.jpg') }}" />
+    <meta property="og:title" content="{{title_string}}" />
 
-    <nav id="other_nav">
-      <a href="{{ url_for('privacy') }}">Privacy Policy</a>
-    </nav>
-  </footer>
+    {% if config.ENV == 'development' %}
+
+    <meta name="robots" content="noindex">
+
+    {% endif %}
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link href="{{ url_for('static', filename='assets/css/main.css') }}" rel="stylesheet" />
+    
+    <script src="{{ url_for('static', filename='assets/bootstrap/bootstrap.bundle.min.js') }}"></script>
+
+    <script defer src="{{ url_for('static', filename='assets/fontawesome/brands.min.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='assets/fontawesome/solid.min.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='assets/fontawesome/fontawesome.min.js') }}"></script>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='images/favicons/apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='images/favicons/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='images/favicons/favicon-16x16.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='images/favicons/site.webmanifest') }}">
+    <link rel="mask-icon" href="{{ url_for('static', filename='images/favicons/safari-pinned-tab.svg') }}" color="#660000">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicons/favicon.ico') }}">
+    <meta name="msapplication-TileColor" content="#2b5797">
+    <meta name="msapplication-config" content="{{ url_for('static', filename='images/favicons/browserconfig.xml') }}">
+    <meta name="theme-color" content="#ffffff">
   {% endblock %}
-</body>
+  </head>
+
+  <body class="bg-light">
+
+    {% block header %}
+
+    <header id="header">
+
+      {% if config.ENV == 'development' %}
+
+        <div class="bg-warning">
+          <div class="container text-center">
+            <i class="fas fa-exclamation-triangle"></i>
+            This is a development website.
+            <a href="https://op.drachenwald.sca.org/">Visit the main website.</a>
+          </div>
+        </div>
+
+      {% endif %}
+
+      <nav id="topmenu" class="navbar navbar-expand-md navbar-dark bg-primary">
+
+        <div class="container">
+
+          <a class="navbar-brand" style="color: #ffff00;" href="/">
+            <img src="{{ url_for('static', filename='images/heraldry.svg') }}" width="50" alt="" /> Drachenwald
+          </a>
+
+          {{ macros.navlist() }}
+
+        </div>
+
+      </nav>
+
+    </header>
+
+    {% endblock %}
+
+    <div class="banner" style="background-image: url('{{ url_for('static', filename='images/default-banner.jpg') }}');">
+      <div class="container"> 
+        <h1 class="display-5 pt-5">{{ title_string }}</h1>
+        <h3 class="pb-5">{% block subtitle %}{% endblock %}</h3>
+      </div>
+    </div>
+
+    <!-- Page Wrapper -->
+    <div id="page-wrapper">
+      <br />
+
+      <div id="main" class="wrapper style3">
+        <div class="container">
+
+          {% block flash %}
+          {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+          <div class="row">
+          {% for category, message in messages %}
+            {% if category == 'error' %}
+            <div class="alert alert-danger"><i class="fa-solid fa-triangle-exclamation"></i> <strong>Error:</strong> {{ message }}</div>
+            {% else %}
+            <div class="alert alert-warning"><i class="fa-solid fa-circle-info"></i> {{ message }}</div>
+            {% endif %}
+          {% endfor %}
+          </div>
+          {% endif %}
+          {% endwith %}
+          {% endblock %}
+
+          <div class="row">
+            <div class="col-12">
+              <section id="content">
+                {% block content %}{% endblock %}
+              </section>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <br />
+    </div>
+
+
+    {% block footer %}
+
+    <nav id="footer" class="navbar navbar-expand-lg bg-primary " style="color: #ffff00">
+
+      <div class="container">
+        <div class="row">
+
+          <div class="col-12 align-middle">
+
+            <br />
+
+            <ul class="list-inline">
+              <li class="list-inline-item pe-3">
+                <a href="{{ url_for('privacy') }}" class="text-reset"><i class="fa-solid fa-person-shelter"></i> Privacy policy</a>
+              </li>
+            </ul>
+
+            <ul class="list-inline">
+              <li class="list-inline-item pe-3">
+                <a href="https://www.facebook.com/groups/852081332478787/" class="text-reset"><i class="fab fa-facebook"></i> Facebook</a>
+              </li>
+            </ul>
+
+            <ul class="list-inline">
+              <li class="list-inline-item pe-3">
+                <a href="https://drachenwald.sca.org" class="text-reset"><i class="fa-solid fa-globe"></i> Drachenwald (SCA Europe)</a>
+              </li>
+              <li class="list-inline-item pe-3">
+                <a href="https://sca.org" class="text-reset"><i class="fa-solid fa-globe"></i> SCA.org (Rest of World)</a>
+              </li>
+            </ul>
+
+            <div>
+              &copy; <script>document.write(new Date().getFullYear());</script>.
+              This is a subsite of the recognised web site for the
+              Kingdom of Drachenwald in the
+              <a href="https://www.sca.org/" class="text-reset">Society for Creative Anachronism</a>. 
+              Copyright on all content and images remains with the creators.
+            </div>
+
+            <br />
+          </div>
+
+
+        </div>
+
+      </div>
+
+    </nav>
+    {% endblock %}
+  </body>
 </html>

@@ -2,129 +2,148 @@
 {% block title %}Search by Award{% endblock %}
 {% block content %}
 <div id="content">
-  <h1>Awards</h1>
   {% if results %}
   <div id="awards">
-    <table class="results">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Award</th>
-          <th>Date</th>
-          <th>Crown</th>
-          <th>Event</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for i in results -%}
-        <tr>
-          <td><a href="{{ url_for('persona', name=i[0]) }}">{{i[0]}}</a></td>
-          <td>{{i[1]}}</td>
-          <td>{{i[2]}}</td>
-          <td>{{i[3]}}</td>
-          <td>{{i[4]}}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+
+    <div class="list-group col-12 col-md-8 col-lg-6 mx-auto shadow mb-4">
+
+      {% for i in results | sort(attribute='0') %}
+
+        <a href="{{ url_for('persona', name=i[0]) }}" class="list-group-item list-group-item-action">
+          <div class="d-flex w-100 justify-content-between">
+            <span>{{i[0]}}</span>
+            <span class="text-muted me-3">{{i[2]}}</span>
+          </div>
+        </a>
+
+      {% endfor %}
+    </div>
+
   </div>
   {% endif %}
 
   <form method="post">
-    <div id="awardsections">
-      <h2>SCA awards</h2>
-      <table>
-        {% for i in awards_sca %}
-        <tr>
-          <td><input type="checkbox" name="{{i[0]}}"/></td>
-          <th><label for="{{i[0]}}">{{i[1]}}</label></th>
-        </tr>
-        {% endfor %}
-      </table>
+    <div id="awardsections" class="row">
+      <div class="col-12 col-md-6 col-lg-4">
 
-      <h2>Drachenwald awards</h2>
-      <table>
-        {% for i in awards_dw %}
-        <tr>
-          <td><input type="checkbox" name="{{i[0]}}"/></td>
-          <th><label for="{{i[0]}}">{{i[1]}}</label></th>
-        </tr>
-        {% endfor %}
-      </table>
+        <div class="border rounded p-3 my-3 shadow text-bg-primary">
+          <h2>Kingdom-wide awards</h2>
+        </div>
 
-      <h2>Principality awards</h2>
-      <h3>Insulae Draconis awards</h3>
-      <table>
-        {% for i in awards_id %}
-        <tr>
-          <td><input type="checkbox" name="{{i[0]}}"/></td>
-          <th><label for="{{i[0]}}">{{i[1]}}</label></th>
-        </tr>
-        {% endfor %}
-      </table>
+        <div class="border rounded p-3 my-3 shadow">
+          <h3>Society awards</h3>
+          {% for i in awards_sca %}
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" name="{{i[0]}}" id="a-{{i[0]}}">
+              <label class="form-check-label" for="a-{{i[0]}}">{{i[1]}}</label>
+            </div>
+          {% endfor %}
+        </div>
 
-      <h3>Nordmark awards</h3>
-      <table>
-        {% for i in awards_nm %}
-        <tr>
-          <td><input type="checkbox" name="{{i[0]}}"/></td>
-          <th><label for="{{i[0]}}">{{i[1]}}</label></th>
-        </tr>
-        {% endfor %}
-      </table>
+        <div class="border rounded p-3 my-3 shadow">
+          <h3>Drachenwald awards</h3>
+          {% for i in awards_dw %}
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" name="{{i[0]}}" id="a-{{i[0]}}">
+              <label class="form-check-label" for="a-{{i[0]}}">{{i[1]}}</label>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
 
-      <h2>Baronial awards</h2>
+      <div class="col-12 col-md-6 col-lg-4">
 
-      <h3>Aarnimetsä awards</h3>
-      <table>
-        {% for i in awards_aa %}
-        <tr>
-          <td><input type="checkbox" name="{{i[0]}}"/></td>
-          <th><label for="{{i[0]}}">{{i[1]}}</label></th>
-        </tr>
-        {% endfor %}
-      </table>
+        <div class="border rounded p-3 my-3 shadow text-bg-primary">
+          <h2>Principality awards</h2>
+        </div>
 
-      <h3>Knight's Crossing awards</h3>
-      <table>
-        {% for i in awards_kc %}
-        <tr>
-          <td><input type="checkbox" name="{{i[0]}}"/></td>
-          <th><label for="{{i[0]}}">{{i[1]}}</label></th>
-        </tr>
-        {% endfor %}
-      </table>
+        <div class="border rounded p-3 my-3 shadow">
+          <h3>Insulae Draconis awards</h3>
+          {% for i in awards_id %}
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" name="{{i[0]}}" id="a-{{i[0]}}">
+              <label class="form-check-label" for="a-{{i[0]}}">{{i[1]}}</label>
+            </div>
+          {% endfor %}
+        </div>
 
-      <h3>Styringheim awards</h3>
-      <table>
-        {% for i in awards_st %}
-        <tr>
-          <td><input type="checkbox" name="{{i[0]}}"/></td>
-          <th><label for="{{i[0]}}">{{i[1]}}</label></th>
-        </tr>
-        {% endfor %}
-      </table>
+        <div class="border rounded p-3 my-3 shadow">
+          <h3>Nordmark awards</h3>
+          {% for i in awards_nm %}
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" name="{{i[0]}}" id="a-{{i[0]}}">
+              <label class="form-check-label" for="a-{{i[0]}}">{{i[1]}}</label>
+            </div>
+          {% endfor %}
+        </div>
 
-      <h3>Gotvik awards</h3>
-      <table>
-        {% for i in awards_gv %}
-        <tr>
-          <td><input type="checkbox" name="{{i[0]}}"/></td>
-          <th><label for="{{i[0]}}">{{i[1]}}</label></th>
-        </tr>
-        {% endfor %}
-      </table>
+      </div>
+
+      <div class="col-12 col-md-6 col-lg-4">
+
+        <div class="border rounded p-3 my-3 shadow text-bg-primary">
+          <h2>Baronial awards</h2>
+        </div>
+
+        <div class="border rounded p-3 my-3 shadow">
+          <h3>Aarnimetsä awards</h3>
+          {% for i in awards_aa %}
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" name="{{i[0]}}" id="a-{{i[0]}}">
+              <label class="form-check-label" for="a-{{i[0]}}">{{i[1]}}</label>
+            </div>
+          {% endfor %}
+        </div>
+
+        <div class="border rounded p-3 my-3 shadow">
+          <h3>Knight's Crossing awards</h3>
+          {% for i in awards_kc %}
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" name="{{i[0]}}" id="a-{{i[0]}}">
+              <label class="form-check-label" for="a-{{i[0]}}">{{i[1]}}</label>
+            </div>
+          {% endfor %}
+        </div>
+
+        <div class="border rounded p-3 my-3 shadow">
+          <h3>Styringheim awards</h3>
+          {% for i in awards_st %}
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" name="{{i[0]}}" id="a-{{i[0]}}">
+              <label class="form-check-label" for="a-{{i[0]}}">{{i[1]}}</label>
+            </div>
+          {% endfor %}
+        </div>
+
+        <div class="border rounded p-3 my-3 shadow">
+          <h3>Gotvik awards</h3>
+          {% for i in awards_gv %}
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" name="{{i[0]}}" id="a-{{i[0]}}">
+              <label class="form-check-label" for="a-{{i[0]}}">{{i[1]}}</label>
+            </div>
+          {% endfor %}
+        </div>
+
+        <div class="border rounded p-3 my-3 shadow">
+          <h3>Eplaheimr awards</h3>
+          {% for i in awards_ep %}
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" name="{{i[0]}}" id="a-{{i[0]}}">
+              <label class="form-check-label" for="a-{{i[0]}}">{{i[1]}}</label>
+            </div>
+          {% endfor %}
+        </div>
+
+      </div>
     </div>
 
-    <table>
-      <tr>
-        <td/>
-        <td>
-          <button type="submit" value="Search">Search</button>
-          <button type="reset" value="Reset">Reset</button>
-        </td>
-      </tr>
-    </table>
+    <div class="text-center w-100 mt-4">
+      <div class="d-grid gap-2 col-6 col-lg-4 mx-auto mb-5 shadow">
+        <button type="submit" value="Search" class="btn btn-primary shadow" href="{{ url_for('search') }}">Search</a>
+      </div>
+    </div>
+
   </form>
 </div>
 {% endblock %}

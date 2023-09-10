@@ -1,18 +1,40 @@
 {% extends "base.html" %}
-{% block title %}Drachenwald OP - Search by Name{% endblock %}
+{% block title %}Search by Name{% endblock %}
 {% block content %}
 <div id="content">
   {% if matches %}
-  <h1>Several names match your query</h1>
-  <table>
-    {% for i in matches %}
-    <tr>
-      <td><a href="{{ url_for('person', surname=i[1], forename=i[2]) }}">{{i[2]}} {{i[1]}}</a></td>
-    </tr>
-    {% endfor %}
-  </table>
+
+    <p class="text-center mb-3">Several names match your query</p>
+
+    <div id="awards" class="mb-3">
+      <div class="list-group col-12 col-md-8 col-lg-6 mx-auto shadow">
+
+        {% for i in matches | sort(attribute='2,1') %}
+
+          <a href="{{ url_for('person', surname=i[1], forename=i[2]) }}" class="list-group-item list-group-item-action">
+            <div class="w-100">
+              {{i[2]}} {{i[1]}}
+            </div>
+          </a>
+
+        {% endfor %}
+      </div>
+    </div>
+
   {% else %}
-  <h1>No names match your query</h1>
+
+    <div class="alert alert-warning col-10 col-lg-8 mx-auto mb-4 shadow">
+      <i class="fa-solid fa-circle-info"></i> No names match your query
+    </div>
+
+    <div class="text-center w-100">
+      <div class="d-grid gap-2 col-10 col-lg-8 mx-auto mt-5 mb-4 shadow">
+        <a class="btn btn-primary shadow" href="{{ url_for('search') }}">Search again</a>
+      </div>
+    </div>
+
   {% endif %}
+
 </div>
+
 {% endblock %}

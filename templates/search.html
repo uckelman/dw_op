@@ -2,70 +2,69 @@
 {% block title %}Drachenwald OP - Search{% endblock %}
 {% block content %}
 <div id="content">
-  <h1>Searches</h1>
 
-  <form method="post">
-    <table class="searchform">
-      <tr>
-        <th>
-          <label for="persona">Persona</label>
-        </th>
-        <td>
-          <input id="persona" name="persona" type="text"/>
-        </td>
-      </tr>
-      <tr>
-        <th>
-          <label for="forename">Forename</label>
-        </th>
-        <td>
-          <input id="forename" name="forename" type="text"/>
-        </td>
-        <th>
-          <label for="surname">Surname</label>
-        </th>
-        <td>
-          <input id="surname" name="surname" type="text"/>
-        </td>
-      </tr>
-      <tr>
-        <th>
-          <label for="begin">Date range</label>
-        </th>
-        <td colspan="3">
-          <input id="begin" name="begin" type="text" placeholder="YYYY-MM-DD" pattern="[12]\d{3}-[01]\d-[0-3]\d"/> &ndash; <input id="end" name="end" type="text" placeholder="YYYY-MM-DD" pattern="[12]\d{3}-[01]\d-[0-3]\d"/>
-        </td>
-      </tr>
-      <tr>
-        <th>
-          <label for="crown">Crown</label>
-        </th>
-        <td colspan="3">
-          <select id="crown" name="crown">
-            <option value=""/>
-          {% for i in crowns %}
-            <option value="{{i[0]}}">{{i[1]}}</option>
-          {% endfor %}
+  <p class="text-center">
+    Search for <strong>one</strong> of these fields
+  </p>
+
+  <div class="row">
+    <div class="col-12 col-md-10 col-lg-8 mx-auto">
+
+      <form method="post">
+
+        <div class="mb-3">
+          <label for="persona" class="form-label"><strong>SCA name</strong></label>
+          <input id="persona" name="persona" type="text" class="form-control">
+        </div>
+
+        <div class="mb-3">
+          <label for="modern-name-group" class="form-label"><strong>Modern name</strong></label>
+          <div class="input-group" id="modern-name-group">
+            <span class="input-group-text" id="forename-desc">Forename</span>
+            <input id="forename" name="forename" type="text" class="form-control" aria-describedby="forename-desc">
+            <span class="input-group-text" id="surname-desc">Surname</span>
+            <input id="surname" name="surname" type="text" class="form-control" aria-describedby="surname-desc">
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="daterange-group" class="form-label"><strong>Date range</strong></label>
+          <div class="input-group" id="daterange-group">
+            <span class="input-group-text" id="begin-desc">Begin</span>
+            <input id="begin" name="begin" type="text" placeholder="YYYY-MM-DD" pattern="[12]\d{3}-[01]\d-[0-3]\d"  class="form-control" aria-describedby="begin-desc">
+
+            <span class="input-group-text" id="end-desc">End</span>
+            <input id="end" name="end" type="text" placeholder="YYYY-MM-DD" pattern="[12]\d{3}-[01]\d-[0-3]\d"  class="form-control" aria-describedby="end-desc">
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="crown" class="form-label"><strong>Crown</strong></label>
+          <select id="crown" name="crown" class="form-select">
+            <option value="" selected>Select a reign</option>
+              {% for i in crowns %}
+                <option value="{{i[0]}}">{{i[1]}}</option>
+              {% endfor %}
           </select>
-        </td>
-      </tr>
-      <tr>
-        <th>
-          <label for="award">Award</label>
-        </th>
-        <td>
-          <input id="award" name="award" type="text"/>
-        </td>
-      </tr>
-      <tr>
-        <td/>
-        <td>
-          <button id="submit" type="submit" value="Search">Search</button>
-          <button id="reset" type="reset" value="Reset">Reset</button>
-        </td>
-      </tr>
-    </table>
-  </form>
+        </div>
+
+        <div class="mb-3">
+          <label for="award" class="form-label"><strong>Award</strong></label>
+          <input id="award" name="award" type="text" class="form-control">
+        </div>
+
+        <div class="text-center w-100 my-4">
+          <div class="d-grid gap-2 col-10 col-sm-8 col-md-6 col-lg-4 mx-auto mb-5">
+            <button class="btn btn-primary mb-3" id="submit" type="submit" value="Search">Search</button>
+            <button class="btn btn-secondary" id="reset" type="reset" value="Reset">Reset</button>
+          </div>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+
 </div>
 
 <script src="{{ url_for('static', filename='js/form.js') }}" type="application/javascript"></script>

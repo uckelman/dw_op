@@ -11,13 +11,19 @@
 {%- endmacro %}
 
 {% macro navlist() -%}
- <ul class="mhlist">
-    <li><a href="{{ url_for('search') }}">Search</a></li>
-    <li><a href="{{ url_for('awards') }}">Awards</a></li>
-    <li><a href="{{ url_for('op') }}">OP</a></li>
-    <li><a href="{{ url_for('reigns') }}">Reigns</a></li>
-    <li><a href="{{ url_for('armorial') }}">Armorial</a></li>
-    <li><a href="{{ url_for('recommend') }}">Recommend Somebody for an award</a></li>
-     <li><a href="https://docs.google.com/forms/d/e/1FAIpQLSdtLQV7XY9ehFnc5T65Q5vPCFZMCB8hUc458JTw34rPRjdipw/viewform?usp=pp_url">Send in a correction</a></li>
-  </ul>
+  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#top-banner-menu" aria-controls="top-banner-menu" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="top-banner-menu">
+    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+      <li class="nav-item"><a class="nav-link" href="{{ url_for('search') }}">Search</a></li>
+      <li class="nav-item"><a class="nav-link" href="{{ url_for('awards') }}">Awards</a></li>
+      <li class="nav-item"><a class="nav-link" href="{{ url_for('op') }}">OP</a></li>
+      <li class="nav-item"><a class="nav-link" href="{{ url_for('reigns') }}">Reigns</a></li>
+      <li class="nav-item"><a class="nav-link" href="{{ url_for('armorial') }}">Armorial</a></li>
+      <li class="nav-item"><a class="nav-link" href="{{ url_for('recommend') }}">Recommend</a></li>
+      <li class="nav-item"><a class="nav-link" href="https://docs.google.com/forms/d/e/1FAIpQLSdtLQV7XY9ehFnc5T65Q5vPCFZMCB8hUc458JTw34rPRjdipw/viewform?usp=pp_url">Correction</a></li>
+    </ul>
+  </div>
 {%- endmacro %}
