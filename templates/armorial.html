@@ -6,20 +6,18 @@
     <div class="row">
 
       {% for i in results -%}
-  
-        <div class="col-6 col-sm-4 col-md-3 col-lg-2 p-3 text-center">
-          
-          <a href="{{ url_for('persona', name=i[0]) }}">
-            <figure class="figure">
-              <img class="figure-img img-fluid" src="{{ url_for('static', filename='images/arms/' + i[1]) }}">
-              <figcaption class="figure-caption text-center">
-                {{ i[0] }}
-              </figcaption>
-            </figure>
-          </a>
-            
-        </div>
-        
+        {% if i[1] %}
+          <div class="col-6 col-sm-4 col-md-3 col-lg-2 p-3 text-center">
+            <a href="{{ url_for('persona', name=i[0]) }}">
+              <figure class="figure">
+                <img class="figure-img img-fluid" src="{{ url_for('static', filename='images/arms/' + i[1]) }}">
+                <figcaption class="figure-caption text-center">
+                  {{ i[0] }}
+                </figcaption>
+              </figure>
+            </a>
+          </div>
+        {% endif %}
       {% endfor %}
 
     </div>
