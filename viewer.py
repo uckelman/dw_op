@@ -625,7 +625,8 @@ def recommend():
                 'recommendation': recommendation,
                 'events': events,
                 'scribe': scribe,
-                'scribe_email': scribe_email
+                'scribe_email': scribe_email,
+                'awards_form':awards
             }
 
             your_email = stripped(request.form, 'your_email')
@@ -642,7 +643,7 @@ def recommend():
                 'time_served': stripped(request.form, 'time_served'),
                 'gender': stripped(request.form, 'gender'),
                 'branch': stripped(request.form, 'branch'),
-                'award_names': ', '.join(request.form.getlist('award_names[]')),
+                'award_names': ', '.join(award_names),
                 'recommendation': rec,
                 'recommendation_sanitized': rec_sanitized,
                 'events': stripped(request.form, 'events'),
