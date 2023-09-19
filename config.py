@@ -2,8 +2,8 @@ import os.path
 
 DB_USER = 'op'
 DB_PWD = 'op'
-DB_DATABASE = 'drachdb2'
-DB_HOST ='127.0.0.1'
+DB_DATABASE = 'drachdb'
+DB_HOST ='db'
 
 DISABLE_AUTH = False
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -29,17 +29,18 @@ USERS = (
         'signet@drachenwald.sca.org'
     )
 )
-ARMORIAL_PATH="./arms"
+
+ARMORIAL_PATH="/home/wiifmqg/dw_op/static/images/arms"
 GOOGLE_CRED = {
-  "type":,
-  "project_id":,
-  "private_key_id":,
-  "private_key":,
-  "client_email":,
-  "client_id":,                  
-  "auth_uri":,                   
-  "token_uri":,                  
-  "auth_provider_x509_cert_url":,
-  "client_x509_cert_url":       ,
-  "universe_domain":,"
+  "type": "service_account",
+  "project_id": "",
+  "private_key_id": "",
+  "private_key": "",
+  "client_email": "",
+  "client_id": "",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "",
+  "universe_domain": "googleapis.com"
 }
