@@ -68,8 +68,6 @@ def close_db(exception):
 
 
 def do_query(cursor, query, *params):
-    print(query)
-    print(params)
     cursor.execute(query, params)
     return [tuple(r) for r in cursor.fetchall()]
 
@@ -397,7 +395,6 @@ def match_persona(c, name):
 
 def db_search_persona(cursor, name):
     if(name.isnumeric()):
-        print("name is numeric")
         return do_query(cursor,"""select distinct p_full.id, p_full.name, p_full.person_id,substring(alt_names,1,length(alt_names)-1) as  alt_names 
 from personae p 
 	left join (select p1.person_id, p1.id,  group_concat(p2.name, ',') as alt_names, p1.name
@@ -408,7 +405,6 @@ from personae p
 			on p.person_id = p_full.person_id
 WHERE id =%s order by p_full.name""", name)
     else:
-        print("regular name")
         return do_query(cursor,"""select distinct p_full.id, p_full.name, p_full.person_id, substring(alt_names,1,length(alt_names)-1) as alt_names 
 from personae p 
 	left join (select p1.person_id, p1.id,  group_concat(p2.name, ',') as alt_names, p1.name
@@ -450,14 +446,12 @@ def search():
         end = stripped(request.form, 'end')
         crown = stripped(request.form, 'crown')
         award = stripped(request.form, 'award')
-        print("search")
 
         try:
             if forename or surname:
                 throw_if(persona, begin, end, crown, award)
                 return search_modern(get_db().cursor(), surname, forename)
             elif persona:
-                print("go search for persona")
                 throw_if(forename, surname, begin, end, crown, award)
                 return search_persona(get_db().cursor(), persona)
             elif begin or end:
@@ -528,14 +522,11 @@ def recommend():
             data['persona_id'] = persona_id = request.form.get('persona', type=int)
             data['award_types'] = request.form.getlist('type')
             data['branch'] = request.form.getlist('branch')            
-            print(data['branch'])
             if '2' in data['branch']:
-                    print("Adding SCA awards")
                     addSCA = data['branch']
                     addSCA.append('1')  #add SCA level awards if Drachenwald is selected
                     data['branch'] = addSCA
                     
-            print(data['branch'])
             if persona_id is None:
                 data['persona'] = stripped(request.form, 'unknown')
                 data['awards'] = []
@@ -545,7 +536,6 @@ def recommend():
             else:
                 data['persona'] = do_query(c, 'SELECT name FROM personae WHERE id =  %s', persona_id)[0][0]
                 data['awards'] = do_query(c, 'SELECT award_types.name, awards.date, award_types.precedence FROM personae AS p1 JOIN personae AS p2 ON p1.person_id = p2.person_id JOIN awards ON p2.id = awards.persona_id JOIN award_types ON awards.type_id = award_types.id  WHERE p1.id = %s ORDER BY awards.date, award_types.name', persona_id)
-            print("persona_id: %s" %persona_id)
             unawards_query = '''SELECT award_types.id, award_types.name, CASE award_types.group_id WHEN 1 THEN 2 ELSE award_types.group_id END AS group_id, award_types.precedence,tooltip  
                                 FROM award_types 
                                     LEFT JOIN (SELECT award_types.id 
@@ -566,7 +556,6 @@ def recommend():
                 }
             
             data['in_op'] = persona_id == -1
-            #print(data['unawards'])
 
             # removes the awards of similar level if already received
             #if 2 in data['unawards']:
@@ -718,11 +707,10 @@ Date | Recommender's Real Name | Recommender's SCA Name | Recommender's Email Ad
              
             service = build('gmail', 'v1', credentials=credentials.with_subject('recommendations@drachenwald.sca.org'))
             message = EmailMessage()
-            print(message) 
             message.set_content(body)
             #TODO: restore this to original
-            #message['To'] = to
-            message['To'] = [your_email]
+            message['To'] = to
+            #message['To'] = [your_email]
             message['Cc'] = [your_email]
             message['From']= cred_info["client_email"]
             message['Subject'] = 'Recommendation'
