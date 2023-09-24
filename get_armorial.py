@@ -50,7 +50,10 @@ items = results.get('files', [])
 import io
 from googleapiclient.http import MediaIoBaseDownload
 for item in items:
-    if item['mimeType'] == 'image/png':
+    print(item['name'])
+    print(item['mimeType'])
+    if (item['mimeType'] == 'image/png') or (item['mimeType'] == 'image/svg+xml') :
+
         fileId = item['id']
         rst = service.files().get_media(fileId = fileId)
         file = io.BytesIO()
@@ -59,6 +62,7 @@ for item in items:
         while done is False:
             status, done = downloader.next_chunk()
         # Write the stuff
+        print("%s/%s" %(config.ARMORIAL_PATH,item['name'].strip()))
         with open("%s/%s" %(config.ARMORIAL_PATH,item['name'].strip()), "wb") as f:
             f.write(file.getbuffer())
             #print(file.getvalue())
