@@ -1,8 +1,14 @@
 # Set up your local environment (this assumes a mac terminal environment)
 
-# Create a sqllite file named op.sqlite with the contents of the op.sqlite.sql file
+## Create a sqlite file named op.sqlite with the contents of the op.sqlite.sql file
 
+```shell
+sqlite3 op.sqlite < op.sqlite.sql
 ```
+
+## Start the Flask app
+
+```shell
 pip install virtualenv
 
 virtualenv venv
@@ -16,7 +22,7 @@ flask --app viewer run
 
 ### Alternative for `flask --app viewer run`:
 
-```
+```shell
 export FLASK_APP=viewer.py
 
 export FLASK_ENV=development
@@ -24,6 +30,10 @@ export FLASK_ENV=development
 flask run
 ```
 
-# local docker
+# Local docker
+
+```
 docker-compose up
-website can be found at 127.0.0.1:5000
+```
+
+The website can be found at 127.0.0.1:5000.
