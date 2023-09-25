@@ -24,8 +24,7 @@ flask --app viewer run
 
 ```shell
 export FLASK_APP=viewer.py
-
-export FLASK_ENV=development
+export FLASK_DEBUG=true
 
 flask run
 ```
