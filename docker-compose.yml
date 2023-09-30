@@ -9,7 +9,7 @@ services:
       - .:/build
     environment:
       - FLASK_APP=viewer.py
-      - FLASK_ENV=development
+      - FLASK_DEBUG=true
     command: bash -c "cd /build && pip install -r requirements.txt && flask run --host=0.0.0.0"
 
   db:
