@@ -1,0 +1,29 @@
+version: '3.7'
+
+services:
+  python:
+    image: 'python:3.5'
+    ports:
+      - "127.0.0.1:5000:5000"
+    volumes:
+      - .:/build
+    environment:
+      - FLASK_APP=viewer.py
+      - FLASK_DEBUG=true
+    command: bash -c "cd /build && pip install -r requirements.txt && flask run --host=0.0.0.0"
+
+  db:
+    image: mariadb
+    environment:
+      - MYSQL_ROOT_PASSWORD=drachdb
+      - MYSQL_DATABASE=drachdb
+      - MYSQL_USER=op
+      - MYSQL_PASSWORD=op
+    volumes:
+      - data:/var/lib/mysql
+      - ./sql-init:/docker-entrypoint-initdb.d
+    ports:
+      - "3306:3306"
+
+volumes:
+  data:

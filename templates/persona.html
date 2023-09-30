@@ -1,58 +1,116 @@
 {% extends "base.html" %}
-{% block head %}
-  {{ super() }}
-  {{ macros.tablesort_head() }}
-{% endblock %}
-{% block title %}Drachenwald OP - {{name}}{% endblock %}
+{%- import "macros.html" as macros %}
+{% block title %}{{name}}{% endblock %}
 {% block content %}
 <div id="content">
   <div id="details">
-    {{emblazon|safe}}
 
-    <h1>{{name}}</h1>
+    <div class="row">
 
-    {% if other %}
-    <h2>also known as {{ ', '.join(other) }}</h2>
-    {% endif %}
+      <div class="col-12 col-sm-8 col-md-10 text-center text-sm-start">
 
-    {% if region %}
-    lately of {{region}}<br/>
-    {% endif %}
-    whose modern name is {% if not has_modname %}not{% endif %} on file</br>
-    {% if blazon %}
-    bearing arms of {{blazon}}
-    {% endif %}
+        <p>
+          <b>{{ name }}</b>, whose modern name is {% if not has_modname %}not{% endif %}
+          on file.
+        </p>
+
+        {% if other %}
+        <p>
+          Also known as {{ ', '.join(other) }}
+        </p>
+        {% endif %}
+
+        {% if region %}
+          <p>Most recently of <b>{{ region }}</b>.</p>
+        {% endif %}
+
+        {% if highest %}
+          <p>
+            Highest award received is
+            <b>{{ highest[0][1] }}</b>
+            from <b>{{ highest[0][3] }}</b>.
+          </p>
+        {% endif %}
+
+        <form method="post" action="https://op.drachenwald.sca.org/recommend">
+          <input type="hidden" name="state" value="1"/>
+          <input name="persona" type="hidden" value="{{persona_id}}"/></td>
+          <button class="btn btn-primary my-2 me-2 shadow" id="submit" type="submit" value="Select">Recommend this person for an award</button>
+          <a href="https://docs.google.com/forms/d/e/1FAIpQLSdtLQV7XY9ehFnc5T65Q5vPCFZMCB8hUc458JTw34rPRjdipw/viewform?usp=pp_url&entry.2122792637={{name}}&entry.1114613229=http://op.drachenwald.sca.org{{request.path}}"
+            class="btn btn-primary my-2 shadow">Send in a correction for {{name}}</a>
+        </form>
+
+      </div>
+
+      <div class="d-none d-sm-inline col-sm-4 col-md-2 text-center">
+        {% if arms_path %}
+          <figure class="figure">
+            <img src="{{ arms_path }}">
+            {% if blazon %}
+              <figcaption class="figure-caption text-center">
+                {{ blazon }}
+              </figcaption>
+            {% endif %}
+          </figure>
+          {% else %}
+          <figure class="figure">
+            <img src="{{ url_for('static', filename='images/arms/noarms.png') }}">
+            <figcaption class="figure-caption text-center">
+              Posthorn does not have heraldry on file
+            </figcaption>
+          </figure>
+        {% endif %}
+      </div>
+
+    </div>
   </div>
 
-  <div id="awards">
-    <table class="results">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Award</th>
-          <th data-sort-default>Date</th>
-          <th>Crown</th>
-          <th>Event</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for i in awards -%}
-        <tr>
-          <td>{{i[0]}}</td>
-          <td>{{i[1]}}</td>
-          <td>{{i[2]}}</td>
-          <td>{{i[3]}}</td>
-          <td>{{i[4]}}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <div class="my-3">
+
+    <div class="accordion col-12 col-md-10 col-lg-10 mx-auto" id="awardlist">
+      {% for i in awards -%}
+        <div class="accordion-item">
+          <div class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{i[1] | urlencode}}-{{i[2] | urlencode}}" aria-expanded="false" aria-controls="collapse-{{i[1] | urlencode}}-{{i[2] | urlencode}}">
+              <div class="row w-100">
+                <div class="col-8 col-lg-6 col-xl-4"><h5>{{i[1]}}</h5></div>
+                <div class="d-none d-xl-inline col-xl-3 text-end text-muted">{{i[4]}}</div>
+                <div class="d-none d-lg-inline col-lg-3 col-xl-3 text-end">{{i[3]}}</div>
+                <div class="col-4 col-lg-3 col-xl-2 text-start ps-3">{{i[2]}}</div>
+              </div>
+            </button>
+          </div>
+          <div id="collapse-{{i[1] | urlencode}}-{{i[2] | urlencode}}" class="accordion-collapse collapse p-3" data-bs-parent="#awardlist">
+            Awarded at <strong>{{i[4]}}</strong> by <strong>{{i[3]}}</strong><br />
+            under the name <strong>{{i[0]}}</strong>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
   </div>
 
-  <script>
-    for (let t of document.getElementsByClassName('results')) {
-      new Tablesort(t);
-    }
-  </script>
+  <div class="row mt-5">
+    <div class="d-inline d-sm-none col-12 text-center">
+      {% if arms_path %}
+        <figure class="figure">
+          <img src="{{ arms_path }}">
+          {% if blazon %}
+            <figcaption class="figure-caption text-center">
+              {{ blazon }}
+            </figcaption>
+          {% endif %}
+        </figure>
+        {% else %}
+        <figure class="figure">
+          <img src="{{ url_for('static', filename='images/arms/noarms.png') }}">
+          <figcaption class="figure-caption text-center">
+            Posthorn does not have heraldry on file
+          </figcaption>
+        </figure>
+      {% endif %}
+    </div>
+  </div>
+
 </div>
 {% endblock %}

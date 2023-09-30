@@ -2,14 +2,20 @@
 {% block title %}Award Recommendation{% endblock %}
 {% block content %}
 <div id="content">
-  <h1>Recommend Someone for an Award</h1>
+  <div class="col-12 col-md-10 col-lg-8 mx-auto">
 
-  <form method="post">
-    <input type="hidden" name="state" value="0"/>
-    <input name="persona_search" type="text"/>
-    <button id="submit" type="submit" value="Search">Search</button>
-    <button id="reset" type="reset" value="Reset">Reset</button>
-  </form>
-
+    <form method="post">
+      <input type="hidden" name="state" value="0"/>
+      
+      <label for="persona" class="form-label"><strong>Recommend someone for an award</strong></label>
+      
+      <div class="input-group mb-5 shadow">
+        <input id="persona" name="persona_search" type="text" class="form-control" placeholder="Enter their SCA name">
+        <button class="btn btn-primary px-5" id="submit" type="submit" value="Search">Search</button>
+      </div>
+      
+    </form>
+    
+  </div>
 </div>
 {% endblock %}
