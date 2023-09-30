@@ -48,7 +48,8 @@ flask run
 docker-compose up
 ```
 
-The website can be found at 127.0.0.1:5000.
+
+The website will start running on http://0.0.0.0:5000.
 
 ## Diagnose and troubleshoot
 
