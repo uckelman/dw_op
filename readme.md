@@ -95,3 +95,20 @@ askja:dw_op hennar$ docker volume rm dw_op_data
 dw_op_data
 askja:dw_op hennar$ 
 
+
+## Diagnose and troubleshoot
+
+The database container, upon not having a database, reads the files in `sql-init/` and execute that SQL.
+
+To view the database container:
+
+```shell
+docker ps # show running containers
+docker exec -it dw_op_db_1 bash # get a Bash shell into the container
+```
+
+If you wish to remove the whole dataset:
+
+```shell
+docker volume rm dw_op_data
+```
